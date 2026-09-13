@@ -1,0 +1,12 @@
+{
+  "name": "jrit-loop",
+  "owner": { "name": "Jeremy Roethel", "url": "https://github.com/jroethel" },
+  "description": "The loop-stack toolkit: brainstorm, plan, drive, review, and track multi-step work through your repo's own issue tracker.",
+  "plugins": [
+    {
+      "name": "jrit-loop",
+      "source": "./",
+      "description": "Eleven prose skills for driving multi-step work: brainstorm, plan, drive, review, improve, molt, track, auto, setup, wayfinder, handoff."
+    }
+  ]
+}

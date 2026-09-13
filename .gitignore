@@ -1,0 +1,6 @@
+*:Zone.Identifier
+*.TMP
+.DS_Store
+*.swp
+evals/results/
+.scratch/
