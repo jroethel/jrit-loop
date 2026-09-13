@@ -193,12 +193,15 @@ check_g() {
   [ -z "$symlinks" ] || fail "check G: symlinks under skills/ are forbidden (nothing in jrit-loop is symlinked):
 $symlinks"
   em=$(printf '\xe2\x80\x94')
+  # The sweep is all shipped markdown and only that: skills/**/*.md,
+  # README.md, and docs/**/*.md. Nothing outside those roots (e.g. NOTES) is
+  # house-style surface.
   while IFS= read -r f; do
     if hit=$(grep -nF "$em" "$f"); then
       fail "check G: $f contains the em dash character U+2014; house style is plain '-' only:
 $hit"
     fi
-  done < <(find skills -name '*.md' -type f | sort)
+  done < <(find skills docs README.md -name '*.md' -type f 2>/dev/null | sort)
   ok "G - no symlinks and no em dashes in shipped markdown"
 }
 
@@ -208,31 +211,24 @@ $hit"
 # harness-appendix-claude-code.md, and fails on the literal SendMessage, the
 # backticked `Agent`, and the slash commands /goal and /loop.
 #
-# The slash patterns carry trailing character classes, ($|[^a-z-]): without them
-# /loop-drive and /loop-plan would false-positive on every skill-name mention,
-# and the ban is on the slash COMMANDS, not on the skill names that happen to
-# share a prefix.
+# The slash patterns carry BOTH boundaries: a trailing class, ($|[^a-z-]), and
+# a leading class, (^|[^A-Za-z0-9./]). Without the trailing class /loop-drive
+# and /loop-plan would false-positive on every skill-name mention; without the
+# leading boundary the path docs/loop/pointer.md that Check D itself requires
+# would false-positive (leading boundary added 2026-09-13, resolving the proven
+# Check D conflict at the wave-2 gate). The ban is on slash-command
+# invocations, not on skill names or paths that share the substring.
 #
 # Exactly one sanctioned pointer sentence may name the appendix, so the core can
 # say where the harness detail went without restating it; more than one such
 # sentence fails, naming both.
 # ---------------------------------------------------------------------------
 slash_command_hit() {
-  # slash_command_hit <line> <command>: true when <line> contains <command> at
-  # end-of-line or followed by a character outside [a-z-].
-  local rest=$1 after offset
-  local word=$2
-  local pfx
-  while [[ $rest == *"$word"* ]]; do
-    pfx=${rest%%"$word"*}
-    offset=$(( ${#pfx} + ${#word} ))
-    rest=${rest:$offset}
-    after=${rest:0:1}
-    if [ -z "$after" ] || [[ ! $after =~ ^[a-z-]$ ]]; then
-      return 0
-    fi
-  done
-  return 1
+  # slash_command_hit <line> <command>: true when <line> contains <command>
+  # bounded on BOTH sides - the character before the slash, when one exists,
+  # is not a letter, digit, '.', or '/', and the command sits at end-of-line
+  # or is followed by a character outside [a-z-].
+  printf '%s\n' "$1" | grep -qE '(^|[^A-Za-z0-9./])'"$2"'($|[^a-z-])'
 }
 
 check_h() {

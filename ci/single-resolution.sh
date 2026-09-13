@@ -51,22 +51,33 @@ for n in $NAMES; do
     count=$((count + 1))
     locs="$locs $HOME/.agents/skills/$n"
   fi
-  canon_found=0
-  canon_locs=""
+  canon_paths=""
   if [ -f "$RECORD" ]; then
     while IFS= read -r p; do
       [ -n "$p" ] || continue
       if [ -e "$p" ]; then
-        canon_found=1
-        canon_locs="$canon_locs $p"
+        canon_paths="${canon_paths}${p}"$'\n'
       fi
     done < <(jq -r --arg n "$n" \
       '(.plugins // {}) | to_entries | map(.value | map(.installPath // empty)) | flatten | map(. + "/skills/" + $n) | .[]' \
       "$RECORD" 2>/dev/null)
   fi
-  if [ "$canon_found" -eq 1 ]; then
+  # Count DISTINCT canonical paths: the record can name the same installPath
+  # more than once (that is still one copy), but two distinct resolved paths
+  # are two real installed copies, and collapsing them to one hid exactly the
+  # duplication this check exists to catch.
+  canon_n=0
+  if [ -n "$canon_paths" ]; then
+    canon_paths=$(printf '%s' "$canon_paths" | sort -u)
+    canon_n=$(printf '%s\n' "$canon_paths" | grep -c '')
+  fi
+  if [ "$canon_n" -gt 1 ]; then
+    fail "$n resolves from $canon_n distinct canonical installed locations; two real installed copies are two locations, not one:
+$(printf '%s\n' "$canon_paths" | sed 's/^/  /')"
+  fi
+  if [ "$canon_n" -eq 1 ]; then
     count=$((count + 1))
-    locs="$locs$canon_locs"
+    locs="$locs $canon_paths"
   fi
   if [ "$count" -ne 1 ]; then
     bad="$bad
