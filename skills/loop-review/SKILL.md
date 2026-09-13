@@ -9,7 +9,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies.
 - **Standards** - does the code conform to this repo's documented coding standards, plus a baseline set of code smells?
 
 Both axes run as parallel fresh-context subagents so they don't pollute each other's context, then this skill aggregates their findings side by side, never merged.
-It has no setup dependency - runs in any repo, even one with zero loop-stack or issue-tracker conventions.
+It has no setup dependency - runs in any repo, even one with zero loop or issue-tracker conventions.
 
 ## Process
 
@@ -36,7 +36,7 @@ Resolve the spec source in this fixed order, stopping at the first hit.
    The disclosure reports the no-spec state plainly, always with the exact phrase "no spec available": as "no spec available (confirmed: none exists)" when the user's own invocation already said no spec exists, otherwise as a "no spec available" warning that says how discovery failed and how to fix it (pass an explicit path, or confirm none exists).
    If plans or briefs exist but none matched the branch, name the most recent by `YYYY-MM-DD` filename date as a labeled suggestion inside that warning, but do not auto-resolve to it.
 
-There is no dependency on `docs/agents/` or any setup file.
+There is no dependency on any setup file or generated state.
 When rung 2 or 3 resolves the source, name it with the exact phrase "matched by branch name" in the disclosure (see step 4).
 Discovery is internal bookkeeping: if rung 2 or 3 matches, state only the one resolved source - never name or describe any other candidate plan or brief file, in the disclosure or either axis's findings.
 

@@ -193,7 +193,7 @@ Read `rubix-autorun` from `docs/loop/pointer.md` (default `ask` when the key is 
 
 On acceptance (or auto), invoke the rubix-review skill on the plan file, then triage its findings as below.
 
-**If the rubix-review skill is not available:** the optional Rubix review is unavailable (rubix-review not installed); continuing without it.
+**If the rubix-review skill is not available:** the optional Rubix review skill is not installed in this session; continuing without it.
 Warn once per context, never per plan, and fall back to Step 7 directly - never a hard failure.
 This is the soft, optional review being skipped, unlike the reviewer-conduct contract, which is a required co-install that fails closed.
 

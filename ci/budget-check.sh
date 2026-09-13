@@ -6,11 +6,9 @@
 # 2026-09-13 was measured against skills/loop-drive/scripts/receipt.sh, and
 # summing the manifests into it would add roughly 25 lines of declarative
 # overhead the approved number never contemplated. The three manifests are
-# asserted present once they exist and their SLOC is printed as information
-# only; they carry no threshold and can never fail this check on size.
-# (Spec edit approved by Jeremy 2026-09-13: while a manifest does not yet exist
-# the check prints 'skip: <path> not yet created' instead of failing, because
-# skills/handoff/agents/openai.yaml is created by parallel Task 7.)
+# asserted present and their SLOC is printed as information only; they carry
+# no threshold and can never fail this check on size. A missing manifest is
+# a hard fail naming its path: all three ship with the plugin.
 set -uo pipefail
 cd "$(dirname "$0")/.." || { echo "FAIL: cannot reach the repo root" >&2; exit 1; }
 
@@ -39,7 +37,7 @@ for p in .claude-plugin/plugin.json .claude-plugin/marketplace.json skills/hando
   if [ -f "$p" ]; then
     echo "info: $p SLOC: $(sloc "$p")"
   else
-    echo "skip: $p not yet created"
+    fail "manifest missing: $p"
   fi
 done
 

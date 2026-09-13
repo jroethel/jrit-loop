@@ -42,6 +42,7 @@ The offer is silenced by a `tracker-remote-ack:` line in the pointer doc - a han
 ### docs/loop/pointer.md
 
 Render the pointer template carried in `references/pointer-templates.md` with the angle-bracket slots filled from this run's answers.
+On a fresh (non-migration) setup the `autonomy-default:` slot is written `pause`, matching the loop-auto skill's default when the key is absent; a migration carries the old repo's value forward.
 Write `local-issues-file:` only when `tracker:` is `local`.
 Omit `tracker-remote-ack:` when rendering: it appears in the file only when the repo pairs a remote codebase with local tracking, and when it appears it was written by hand; on a re-run, preserve an existing `tracker-remote-ack:` line rather than dropping it.
 
@@ -123,7 +124,7 @@ Read the old file's `tracker:`, `rubix-autorun:`, `autonomy-default:`, and Lanes
 Render `docs/loop/pointer.md` and `docs/loop/conventions.md` from them using the templates in `references/pointer-templates.md`: `rubix-autorun:` and `autonomy-default:` keep their names and values, and each old lane becomes the tracker read named in the Lanes table, with no mirror.
 Then handle the generated mirrors, preview-then-assent and never silent:
 
-1. List the mirror files actually found - `ISSUES.md`, `BACKLOG.md`, `WAYFINDER.md`, and `docs/chain-state.md` - with a count, for example "found 2 mirror files: ISSUES.md, BACKLOG.md".
+1. List the files actually found - the three mirror files `ISSUES.md`, `BACKLOG.md`, and `WAYFINDER.md`, plus the one runtime state file `docs/chain-state.md` - with a count, for example "found 2: ISSUES.md, BACKLOG.md".
 2. State plainly that they are untracked and therefore unrecoverable once removed, and that they are deleted rather than frozen because the tracker's own UI is now the view.
 3. Delete them only after explicit assent.
    A decline leaves every file in place and ends the migration with nothing removed.

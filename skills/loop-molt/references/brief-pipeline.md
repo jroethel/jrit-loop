@@ -75,7 +75,7 @@ On an accepted commit, graduate the brief's Parking lot into backlog issues.
 This contract is shared by loop-brainstorm and loop-improve and lives only here; each caller invokes it from its own terminal step.
 
 - **Preview first.** Announce the parked-item count and each item's derived title, and ask for assent before creating anything.
-- **Invoke on assent.** Parse the brief's `## Parking lot` section and open one `idea`-labeled issue per parked item with `gh issue create --label idea --title <first sentence, period-free> --body <the bullet plus its restart context and a link to the brief>`, the body following the graduated-item template in `config/conventions.md`.
+- **Invoke on assent.** Parse the brief's `## Parking lot` section and open one `idea`-labeled issue per parked item with `gh issue create --label idea --title <first sentence, period-free> --body <the bullet plus its restart context and a link to the brief>`, the body following the graduated-item template in `docs/loop/conventions.md`.
 - **Parking-lot bullet shape.** Each parked item is one bullet whose first sentence is the derived issue title and MUST be period-free and filename-free: the title is truncated at the first dot, so a leading filename self-truncates. A `Restart context:` continuation line carries what a later session needs to pick the item back up.
 - **Verbose announce.** Each created issue is announced with its number and title.
 - **Reverse.** Undo a graduated issue with `gh issue close <num>` or `glab issue close <num>` per the declared tracker mode.
