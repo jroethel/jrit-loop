@@ -1,0 +1,25 @@
+# ci/banned-tokens.txt - fixed strings Check A forbids anywhere under skills/.
+# One token per line; "#" starts a comment. Read at run time by ci/structure-check.sh;
+# never hard-code this list inside a script.
+# The /skills/-suffixed home forms are banned, not the bare ~/.claude and ~/.agents,
+# because the shipped reviewer-conduct contract legitimately names the bare paths as
+# examples of barred mutations; the /skills/ forms are what a dangling cross-skill
+# reference actually looks like.
+~/.claude/skills/
+~/.agents/skills/
+${CLAUDE_PLUGIN_ROOT}
+/home/
+/Users/
+C:\
+scripts/tracker.sh
+scripts/gen-mirrors.sh
+scripts/graduate-parking.sh
+scripts/lifecycle-lint.sh
+scripts/migrate-tracker.sh
+scripts/session-card.sh
+scripts/handoff-log.sh
+scripts/take-stock.sh
+config/routing/
+config/reviewer-conduct-contract.md
+skills/loop-
+docs/chain-state.md

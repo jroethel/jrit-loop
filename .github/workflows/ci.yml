@@ -1,0 +1,36 @@
+# CI for jrit-loop: criteria 1, 2, 4, 7, 9 on every push (criterion 10).
+# ci/secrets-scan.sh is not run here because criterion 9 is covered by
+# gitleaks-action in this job; the script remains the local and full-history
+# (Task 13) engine. ci/clean-room-npx.sh and ci/single-resolution.sh are
+# host-mutating manual checks (Task 14) and never run in CI.
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Secrets scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Structure check
+        run: bash ci/structure-check.sh
+      - name: Budget check
+        run: bash ci/budget-check.sh
+      - name: Version drift check
+        run: bash ci/version-drift.sh
+      - name: Consumer sweep
+        run: bash ci/consumer-sweep.sh
+      - name: Install claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate marketplace manifest
+        run: claude plugin validate --strict .
+      - name: Validate plugin manifest
+        run: claude plugin validate --strict .claude-plugin/plugin.json

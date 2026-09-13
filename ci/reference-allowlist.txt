@@ -1,0 +1,21 @@
+# ci/reference-allowlist.txt - file tokens Check B skips, one token per line,
+# each with a trailing "# why" justification. Append-only: port tasks add lines
+# here with their own why; never rewrite or delete another task's line.
+config/repo-state.md # why: target-repo state map of the pre-plugin layout, named in ported prose as a file the user's repo may carry, not a skill-shipped file
+config/conventions.md # why: target-repo conventions doc of the pre-plugin layout, named in ported prose, not a skill-shipped file
+AGENTS.md # why: target-repo instructions file loop-setup writes a managed section into, named in prose, not a skill-shipped file
+CLAUDE.md # why: target-repo instructions file loop-setup writes the @AGENTS.md import into, named in prose, not a skill-shipped file
+README.md # why: target-repo readme named in ported prose, not a skill-shipped file
+ROADMAP.md # why: target-repo roadmap named in ported prose, not a skill-shipped file
+ringer.py # why: external tool file in the ringer repo, named in loop-drive prose and its ringer stub probe, not a skill-shipped file
+MODEL-NOTES.md # why: dated model-log file inside the ringer repo (external tool), named in loop-drive prose, not a skill-shipped file
+AMENDMENTS-PENDING.md # why: amendment-queue file inside the ringer repo (external tool), named in loop-drive prose, not a skill-shipped file
+install.sh # why: named backticked in the shipped reviewer-conduct contract as examples of barred commands, not as references to files that must resolve
+setup.sh # why: named backticked in the shipped reviewer-conduct contract as examples of barred commands, not as references to files that must resolve
+ISSUES.md # why: deletion target named in loop-setup's migration prose, not a reference to a file that must resolve
+BACKLOG.md # why: deletion target named in loop-setup's migration prose, not a reference to a file that must resolve
+WAYFINDER.md # why: deletion target named in loop-setup's migration prose, not a reference to a file that must resolve
+_loop.md # why: drive-unit run-state file in the target repo, named in loop-drive prose as a file that already exists there, not a skill-shipped file (added by Task 3's Check B pre-run)
+PRODUCT.md # why: illustrative example of a decision doc in the audited repo (loop-improve audit playbook), not a reference that must resolve (added by Task 3's Check B pre-run)
+CODING_STANDARDS.md # why: illustrative example of a standards source in the repo under review (loop-review), not a reference that must resolve (added by Task 3's Check B pre-run)
+CONTRIBUTING.md # why: illustrative example of a standards source in the repo under review (loop-review), not a reference that must resolve (added by Task 3's Check B pre-run)
