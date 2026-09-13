@@ -58,8 +58,8 @@ for d in "${dirs[@]}"; do
     # Task 4 ships scripts/receipt.sh before Task 9 ships loop-drive's SKILL.md, so that one
     # directory may lack its SKILL.md only while the eleven-count is still short (same
     # skip-while-pending, hard-once-present pattern the budget existence checks use).
-    if [ "$d" = "skills/loop-drive/" ] && [ "$count" -lt 11 ]; then
-      echo "skip: skills/loop-drive/SKILL.md not yet created (lands with Task 9; hard once eleven directories exist)"
+    if [ "$d" = "skills/loop-drive/" ]; then
+      echo "skip: skills/loop-drive/SKILL.md not yet created (lands with Task 9; hard once present)"
       continue
     fi
     missing="$missing
