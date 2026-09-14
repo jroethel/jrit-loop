@@ -100,9 +100,11 @@ Resolved on this host, 2026-09-13, with the line-anchored filter:
 - `~/repos/vaultwise/config/repo-state.md`
 - `~/repos/loop-stack-session/config/repo-state.md`
 
-Resolved count: 3.
-The brief claimed eight rolled repos; the mismatch was reconciled with Jeremy at the C3 handoff on 2026-09-13.
-A widened sweep (depth 5 across ~/repos, ~/claude, ~/projects, and ~/.claude, at Jeremy's direction) found the same three repos and nothing more, so the brief's eight was stale and the three-repo list above is the confirmed migration surface.
+Resolved count on this host: 3.
+The brief's eight was reconciled with Jeremy at the C3 handoff on 2026-09-13: the count is per-host, and the eight split across two machines.
+This WSL host carries the three repos above; the remaining rolled repos live under `~/create/` on RIT-UADV2213 (the Mac), per the seam-1 propagation runbook of 2026-09-07 (pokemine, skills/rubix-review, ai-benchmark, iamawriter, substack-scraper, sys-prompts-cc, vaultwise; rubix-review and vaultwise exist on both hosts as separate checkouts).
+The Mac's sweep must include `~/create/` and use a depth that reaches `create/skills/rubix-review`, which sits two levels down - the exact depth trap this section documents.
+Confirmed C3 host list, 2026-09-13: this WSL host (fired) and RIT-UADV2213 (pending; run Section 2 there, then its own single-resolution line lands in the receipts doc).
 One property of the prescribed command belongs in that reconciliation: `-maxdepth 3` reaches `config/repo-state.md` only for a repo sitting exactly one level under `$HOME/repos`, because the file adds two more levels of its own; a repo nested two levels down places the file at depth four, outside the sweep.
 So if any of the missing five repos are nested two levels deep, this command cannot see them however many there are, and the C3 handoff should decide whether to re-resolve with a deeper `-maxdepth` or a different scope.
 loop-stack-session itself appearing in the resolved list is a membership question for the same reconciliation: it is the source checkout the farm points at, not obviously a repo to migrate.
