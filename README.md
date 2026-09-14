@@ -17,7 +17,7 @@ From a Claude Code marketplace:
 Or with the `skills` CLI:
 
 ```
-npx skills@<VERSION> add jroethel/jrit-loop
+npx skills@1.5.26 add jroethel/jrit-loop
 ```
 
 ## The eleven skills

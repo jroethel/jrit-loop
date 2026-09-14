@@ -56,7 +56,7 @@ extract_backtick_tokens() {
 }
 
 for name in $NAMES; do
-  npx --yes skills add jroethel/jrit-loop --skill "$name" -y \
+  npx --yes skills add jroethel/jrit-loop --skill "$name" -y -g \
     || fail "npx skills add jroethel/jrit-loop --skill $name did not exit 0"
   inst=""
   for cand in "$HOME/.claude/skills/$name" "$HOME/.agents/skills/$name"; do
