@@ -25,6 +25,14 @@
 # the runtime's record, never globbed - while ~/.claude/skills and
 # ~/.agents/skills are checked directly because that is where the symlink farm
 # lived.
+#
+# One layout is deliberately counted as a SINGLE resolution even though it
+# populates both of those directories: the skills-CLI (npx skills add) install,
+# where ~/.agents/skills/<n> is a real directory and ~/.claude/skills/<n> is a
+# symlink into it. That is one physical copy reached by two paths - Claude Code
+# only reads ~/.claude/skills, so the symlink is mandatory. It is distinguished
+# from the pre-decommission farm, whose ~/.agents/skills/<n> hop is itself a
+# symlink to a repo checkout, by the real-directory test in the loop below.
 set -uo pipefail
 
 fail() { echo "SINGLE-RESOLUTION FAIL: $1" >&2; exit 1; }
@@ -43,13 +51,33 @@ bad=""
 for n in $NAMES; do
   count=0
   locs=""
-  if [ -e "$HOME/.claude/skills/$n" ]; then
-    count=$((count + 1))
-    locs="$locs $HOME/.claude/skills/$n"
+  # Skills-CLI cross-tool layout collapses to one resolution: the real copy is a
+  # directory at ~/.agents/skills/<n> and ~/.claude/skills/<n> is a symlink into
+  # it, so the same physical copy reached by two paths counts once. The farm is
+  # NOT collapsed: there ~/.agents/skills/<n> is itself a symlink into a repo
+  # checkout, so the -d/! -L test fails and both paths count, which is the
+  # duplication this check exists to catch.
+  claude_p="$HOME/.claude/skills/$n"
+  agents_p="$HOME/.agents/skills/$n"
+  collapsed=0
+  if [ -d "$agents_p" ] && [ ! -L "$agents_p" ] && [ -L "$claude_p" ]; then
+    cp_real="$(cd "$claude_p" 2>/dev/null && pwd -P)"
+    ap_real="$(cd "$agents_p" 2>/dev/null && pwd -P)"
+    if [ -n "$ap_real" ] && [ "$cp_real" = "$ap_real" ]; then
+      collapsed=1
+      count=$((count + 1))
+      locs="$locs $agents_p (with $claude_p symlinked into it)"
+    fi
   fi
-  if [ -e "$HOME/.agents/skills/$n" ]; then
-    count=$((count + 1))
-    locs="$locs $HOME/.agents/skills/$n"
+  if [ "$collapsed" -eq 0 ]; then
+    if [ -e "$claude_p" ]; then
+      count=$((count + 1))
+      locs="$locs $claude_p"
+    fi
+    if [ -e "$agents_p" ]; then
+      count=$((count + 1))
+      locs="$locs $agents_p"
+    fi
   fi
   canon_paths=""
   if [ -f "$RECORD" ]; then
