@@ -101,8 +101,8 @@ Resolved on this host, 2026-09-13, with the line-anchored filter:
 - `~/repos/loop-stack-session/config/repo-state.md`
 
 Resolved count: 3.
-The brief claims eight rolled repos, so the plan and the disk disagree, and this sweep is not complete.
-Per the plan's own instruction the mismatch stops the sweep for reconciliation with Jeremy at the C3 handoff; do not record the mirror deletion as done against a three-repo list.
+The brief claimed eight rolled repos; the mismatch was reconciled with Jeremy at the C3 handoff on 2026-09-13.
+A widened sweep (depth 5 across ~/repos, ~/claude, ~/projects, and ~/.claude, at Jeremy's direction) found the same three repos and nothing more, so the brief's eight was stale and the three-repo list above is the confirmed migration surface.
 One property of the prescribed command belongs in that reconciliation: `-maxdepth 3` reaches `config/repo-state.md` only for a repo sitting exactly one level under `$HOME/repos`, because the file adds two more levels of its own; a repo nested two levels down places the file at depth four, outside the sweep.
 So if any of the missing five repos are nested two levels deep, this command cannot see them however many there are, and the C3 handoff should decide whether to re-resolve with a deeper `-maxdepth` or a different scope.
 loop-stack-session itself appearing in the resolved list is a membership question for the same reconciliation: it is the source checkout the farm points at, not obviously a repo to migrate.
