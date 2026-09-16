@@ -163,6 +163,9 @@ Ringer's own footguns (deliverable loss on a passing worktree, gitignored output
 - **Embedded how-to-run.** State exactly how to build/test so the worker and the check agree.
 - **Output contract.** State the exact deliverable files (and set `expect_files`).
 - **Check-writing rules (P14: checks are as important as specs).** The check prints WHY it fails (a silent exit 1 starves the retry prompt and the eval log). It verifies substance, not just presence. The FULL check-writing ruleset lives in the ringer skill's "Check-writing rules" section - read it before writing any check; do not work from this summary (it summarizes, ringer governs; checks that pass this summary can still break ringer's rules - unsatisfiable under the spec's boundary, repo-wide negative greps, invariants missing their exceptions - and produce false FAILs).
+  Prove non-vacuity with a committed expected-fail fixture, never a live mutate-and-restore probe: a check must never mutate the working tree to demonstrate it can fail and then restore it, because that authors dirt the protocol then trips on and can corrupt the tree if the run dies mid-probe.
+  This proof is run on demand only, never a per-run obligation: it is exercised when non-vacuity is in doubt, not required of every check on every run.
+  The expected-fail fixture convention - its naming, its location, and how a run references it - is governed by the ringer skill's "Check-writing rules" section, which is its single home; until that convention is authored there, skip the non-vacuity proof rather than fall back to a live probe.
 
 **Both transports:** the validator/review stance is adversarial and evidence-first (P2: worker self-reports are worthless).
 Judge the raw evidence (the diff, the executed check output, the artifact), and ignore the implementer's own narrative of what it did.
