@@ -142,7 +142,8 @@ Ringer's own footguns (deliverable loss on a passing worktree, gitignored output
 - **Nested repos**: if the code lives in a repo nested inside the session's outer repo, the harness's built-in worktree isolation snapshots the WRONG repo; the implementer must create the worktree itself with explicit `git -C <inner-repo> worktree add ...` commands you spell out.
 - **Per-worktree environments**: in-project venvs do not travel; the template includes the install step (e.g. `poetry install`) inside the worktree.
 - **Shared append-only files** (run logs, checklists): convert to one-file-per-unit (`<log>/unit-NN.md`); the orchestrator writes the combined summary at the gate. State this as an explicit, once-noted deviation from the source plan.
-- **Dirty working tree**: worktrees branch from committed state only; pre-flight surfaces uncommitted changes to the human before wave 1.`[gate:STOP]`
+- **Dirty working tree**: the run's gate journal is committed first by the pre-flight journal-commit step (its creation-and-commit timing is homed in the loop-auto skill), so the journal is never the protocol dirt this STOP trips on.
+  This STOP stays absolute and autonomy never auto-resolves it; worktrees branch from committed state only, and pre-flight then surfaces any remaining uncommitted changes to the human before wave 1.`[gate:STOP]`
 - **Disjoint-files assumption**: within-wave units touch disjoint files by construction; a merge conflict at the gate is a scope violation, not something to quietly resolve.
 
 ## Step 4 - Convert the prompt templates (per transport)
@@ -254,7 +255,7 @@ Write `<source-plan-name>_loop.md` next to the source plan, containing, in order
 2. **Routing table**: the per-unit table with the columns Unit, Wave, task_type, Model, Transport, Engine, Impl. effort, Val. effort, Evidence.
 3. The orchestration shape and the three validation layers (implementer self-check, per-unit validator, orchestrator gate), plus the topology diagram (updated from Step 0 if compilation changed the shape).
 4. The hazard mitigations from Step 3, each marked as a deviation from the source plan where it is one.
-5. Pre-flight checklist (repo state, environment versions, integration branch creation, log directory; for ringer waves, the engines present; the Step 0 probe results, with each fired Disclose line quoted verbatim).
+5. Pre-flight checklist (the run's gate journal committed by the pre-flight journal-commit step as the first item; repo state, environment versions, integration branch creation, log directory; for ringer waves, the engines present; the Step 0 probe results, with each fired Disclose line quoted verbatim).
 6. The wave-loop procedure and gate checklist from Step 5, including slip rules, the ask-the-human list, and the final-wave advisory terminal loop-review review.
 7. A quota/resume section: durable-state rules, the reconciliation procedure, and the verbatim resume prompt.
 8. The implementer/validator prompt templates (background-agent) and/or the manifest task templates (ringer) from Step 4.
