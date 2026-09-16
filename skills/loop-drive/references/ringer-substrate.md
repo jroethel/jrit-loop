@@ -27,8 +27,11 @@ Run-level: `run_name` (the SAME across every wave of the build), `workdir`, `wor
 
 ## Isolation and the patch-export pattern
 
+Guidance current as of 2026-09-15 against ringer at `~/repos/ringer` (lint rule `ringer.py:1830`).
 Run-level `"worktrees": true` gives each task an isolated git worktree, so you do not re-specify per-task isolation.
-But a passing task's worktree is DELETED, and worker commits die with it. Mitigations the plan must carry:
+But a passing task's worktree is DELETED, and worker commits die with it.
+Ringer's lint enforces this: any spec instructing `git commit` under worktrees is hard-blocked, so the worker must leave changes uncommitted and the check exports the diff.
+Mitigations the plan must carry:
 
 - **Deliverables outside the worktree**, or the check exports them first: `git add -A && git diff --cached > <path-outside-worktree>.patch`; you apply and commit on your branch after review.
 - **Gitignored outputs** (`dist/`, build dirs) are not staged by `git add -A`; the check must `cp` them to a path outside the worktree explicitly. Verify the patch AND the copies.
