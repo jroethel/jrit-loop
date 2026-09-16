@@ -36,6 +36,9 @@ tracker-remote-ack: <github|gitlab>
 | Reviews   | `docs/reviews/`                    | One file per review run.                        |
 | Archive   | `docs/archive/`                    | Moved work lands here.                          |
 
+Files in the doc-tree homes above share one filename grammar: `YYYY-MM-DD.<descriptor>.md`, date first, dot-separated, the descriptor a short slug with optional tracker-token segments (e.g. `.I6` for issue 6).
+The loop-drive resume pointer (`YYYY-MM-DD.<unit-slug>.resume.md`) and the loop-auto batch-review journal (`YYYY-MM-DD.<tokens>.<slug>-batch-review.md`) are the two fixed instances of that grammar.
+
 The tracker is the single source of truth; no generated mirror files exist.
 Claim, done, status, and next-eligible run through the receipt helper shipped inside the loop-drive skill.
 In `local` mode the receipt helper does not run: claim ordering and evidence-gated done are unenforced, and this repo is single-machine only.
