@@ -191,7 +191,10 @@ Background-agent units: the harness runs them as parallel background workers and
 Read all results and verdicts from both transports.
 Ringer: consume the run JSON in `~/.ringer/runs/` and the raw worker logs in `<workdir>/logs/` per ringer's post-run ritual (read every retried/failed log, spot-check at least one passing artifact).
 The run JSON is truth; a detached/background shell's exit status is transport and can report failure for a run that passed.
-On a FAIL, attribute before relaunching: re-run the check's steps yourself against the tree - if the worker's output was correct and the CHECK was wrong, fix the check, commit the audited work, and annotate the model log (MODEL-NOTES + amendment when available) instead of burning a round.
+On a FAIL, attribute before relaunching, and attribution is always a fresh re-run of the check rather than a precedent substitution.
+Citing an earlier gate's verdict in place of running the check now is the banned move: a verdict from a prior run is not evidence about the current tree, so an earlier pass never stands in for the check this FAIL owes.
+The already-allowed move is the re-run and its honest consequence: re-run the check's steps yourself against the tree, and if the worker's output was correct and the CHECK was wrong, fix the check, commit the audited work, and annotate the model log (MODEL-NOTES + amendment when available) instead of burning a round.
+Quota exhaustion is a STOP, never a license to skip a check: when quota runs out mid-attribution the run halts and states what it needs, and the fresh check is still owed on resume.`[gate:STOP]`
 Background-agent units: skim diffs of Opus-tier units and test files of Sonnet-tier units.
 Merge passing branches (or apply reviewed patches) into the integration branch; run the full suite there.
 Resolve stopped units: a small spec issue means edit the spec artifact and relaunch that unit; a design issue is recorded for the plan's downstream review step under the source plan's slip rules.`[gate:STOP]`
