@@ -71,6 +71,9 @@ An entry with no honest reversal path should have been a STOP, not auto-taken.
 
 The session active when autonomy takes effect orchestrates the rest of the chain.
 Delegation only goes down-tier - the orchestrator hands work to sonnet, opus, or haiku workers, or to ringer-transported GLM/codex.
+The orchestrator never edits a deliverable itself, not even a one-line fix: every change to a deliverable, however small, is a down-tier relaunch of a worker, because the orchestrator reads logs, verdicts, and core diffs only and never implements.
+A deliverable here is a worker's produced artifact; the spec, plan, or check the orchestrator owns is not a deliverable, and its existing edit rules (a single-unit spec edit of 15 or fewer lines auto-taken as BATCH, and fixing a wrong check then committing the audited work) are unchanged.
+A one-line fix to a deliverable is therefore unambiguously a relaunch of a worker, never an orchestrator keystroke on the deliverable.
 Nobody ever spawns Fable.
 Fable is orchestrator-tier only and never a worker, so the autonomy continuation never delegates to it, not even under full auto.
 
