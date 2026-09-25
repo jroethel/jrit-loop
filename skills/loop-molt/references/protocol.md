@@ -5,6 +5,7 @@ This copy is canonical and self-contained; it has no upstream source file.
 Distilled 2026-08-15 from the loop-stack-vs-research evaluation session.
 Purpose: a repeatable workflow for re-evaluating any skill or prose instruction against what the harness now does natively, so plumbing gets deleted and policy survives.
 Applies to: SKILL.md files, CLAUDE.md blocks, operating manuals, run-books - any instruction prose an agent consumes.
+"molt" has a second sense in a sibling override-pack project: sys-prompts-cc uses "molt" for realigning an override pack to a new harness version, and this protocol stays independent of that sense.
 
 ## The one-line test
 
@@ -26,6 +27,18 @@ The auditing session does its own pull, in two tiers:
 
 - **Thin refresh (default, minutes):** changelog scan plus one live probe of any load-bearing feature claim (run the command in a scratch repo). Sufficient for a single artifact.
 - **Deep refresh (occasional):** a full research pull (last30days or equivalent). Warranted for a whole-stack recalibration or a model-generation change, not per artifact.
+
+**Harness evidence.** The plumbing bin, conflicts with the harness, and premises about the harness are judged against the harness instruction corpus, the prompt set actually running: stock prompts, or the override set if one is applied.
+That corpus is the Piebald prompt catalog, `https://github.com/Piebald-AI/claude-code-system-prompts`.
+Read it at the catalog tag matching the running harness version, never at its head; when that tag is missing or differs from the catalog version in use, record both versions and mark dependent verdicts unverified.
+The index date is the commit date of the tag for a direct read, or the semantic index's last update for an indexed read, with the indexed catalog version recorded as a second version.
+A semantic index is optional and only finds paraphrase candidates, so confirm every index hit in the pinned tag.
+Re-indexing changes local state, so the audit never re-indexes; it reads whatever index already exists.
+A conflict with the harness is actionable only when the harness text does not already defer to the user.
+Each harness-based finding cites the harness file, its version, and its index date.
+With no corpus at hand, fall back to memory and mark every dependent verdict unverified.
+The corpus never ships with the skill; fetch it from the catalog named above.
+Which input serves which finding class is tabulated in `references/evidence.md`.
 
 Date-stamp the snapshot; it is the evidence base and its expiry. After the first audit, the drift ledger lets the next one diff from the last snapshot instead of re-researching from zero.
 
