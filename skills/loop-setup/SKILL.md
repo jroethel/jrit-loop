@@ -82,6 +82,9 @@ Write `CLAUDE.md` at the target repo root containing the single line `@AGENTS.md
 Append that line when the file exists and does not already contain it.
 Never rewrite any other line of an existing `CLAUDE.md`.
 
+When the repo root is itself a plugin root (it has `.claude-plugin/plugin.json`), apply the same rules to `.claude/CLAUDE.md` with the line `@../AGENTS.md` instead, because `claude plugin validate --strict` fails on a `CLAUDE.md` at the plugin root.
+Claude Code loads `.claude/CLAUDE.md` as project context the same way (verified 2026-09-25).
+
 ## The label set
 
 The sixth action exists because nothing else in the system creates the labels.

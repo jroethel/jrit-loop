@@ -19,3 +19,5 @@ _loop.md # why: drive-unit run-state file in the target repo, named in loop-driv
 PRODUCT.md # why: illustrative example of a decision doc in the audited repo (loop-improve audit playbook), not a reference that must resolve (added by Task 3's Check B pre-run)
 CODING_STANDARDS.md # why: illustrative example of a standards source in the repo under review (loop-review), not a reference that must resolve (added by Task 3's Check B pre-run)
 CONTRIBUTING.md # why: illustrative example of a standards source in the repo under review (loop-review), not a reference that must resolve (added by Task 3's Check B pre-run)
+.claude/CLAUDE.md # why: target-repo instructions file loop-setup writes the @../AGENTS.md import into when the repo root is a plugin root, named in prose, not a skill-shipped file (added by issue #27)
+.claude-plugin/plugin.json # why: target-repo plugin manifest loop-setup checks for to detect a plugin root, named in prose, not a skill-shipped file (added by issue #27)

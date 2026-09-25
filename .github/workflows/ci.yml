@@ -33,5 +33,4 @@ jobs:
       - name: Validate marketplace manifest
         run: claude plugin validate --strict .
       - name: Validate plugin manifest
-        # Not --strict until jrit-loop issue #27 resolves the root CLAUDE.md warning.
-        run: claude plugin validate .claude-plugin/plugin.json
+        run: claude plugin validate --strict .claude-plugin/plugin.json

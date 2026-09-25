@@ -18,12 +18,11 @@ done
 if command -v claude >/dev/null 2>&1; then
   echo "== claude plugin validate --strict . (marketplace manifest)"
   claude plugin validate --strict . || fail "claude plugin validate --strict . failed"
-  # Not --strict: the root CLAUDE.md warning is a known, tracked exception (jrit-loop issue #27).
-  echo "== claude plugin validate .claude-plugin/plugin.json (plugin manifest and components)"
-  claude plugin validate .claude-plugin/plugin.json || fail "claude plugin validate .claude-plugin/plugin.json failed"
+  echo "== claude plugin validate --strict .claude-plugin/plugin.json (plugin manifest and components)"
+  claude plugin validate --strict .claude-plugin/plugin.json || fail "claude plugin validate --strict .claude-plugin/plugin.json failed"
 else
   echo "skip: claude plugin validate --strict . (claude binary not on PATH)"
-  echo "skip: claude plugin validate .claude-plugin/plugin.json (claude binary not on PATH)"
+  echo "skip: claude plugin validate --strict .claude-plugin/plugin.json (claude binary not on PATH)"
 fi
 
 echo "PASS: all"
