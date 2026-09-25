@@ -117,6 +117,11 @@ Text sketch of task-level depends-on relations (which tasks can run in parallel,
 Where the executor stops and asks a human.
 Every [judgment] criterion from the brief lands here, never on a task.
 
+## Run shape
+A table, one row per task: Wave | Task | Shape | Why.
+Wave comes from Depends-on: a task with none is wave 1, any other is one past the highest wave among its dependencies.
+Shape is auto (executed acceptance check, files disjoint from its wave-mates) or human (irreversible or outward-facing: a push, deploy, publish, send, or delete of something a person owns).
+
 ## How to run
 The build/test/setup commands the whole plan assumes, exact and paste-able.
 ```
@@ -171,6 +176,7 @@ Look at the written plan with fresh eyes and fix inline:
 3. **Type consistency** - names and signatures in later tasks match what earlier tasks defined.
 4. **Loop-drive contract check** - per task: scope stated, acceptance check executed not judged, ownership exclusive, depends-on complete, readable in isolation. Parallel-eligible tasks (no path between them) touch disjoint files.
 5. **Agnosticism scan** - the plan survives an executor who has never heard of this toolchain; no skill names, no harness features.
+6. **Run shape** - every task appears exactly once, each wave matches the task's Depends-on edges, and every human row says why.
 
 ## Step 6 - The Rubix review (optional)`[gate:DEFAULT]`
 
@@ -202,6 +208,8 @@ This is the soft, optional review being skipped, unlike the reviewer-conduct con
 
 ## Step 7 - User review gate`[gate:DEFAULT]`
 
+Print the plan's Run shape table first, so the auto/human split is reviewed while the plan is fresh; the user may flip any task's shape, and each flip is written into the Run shape section with its reason so it is not re-litigated downstream.
+Under autonomy the derived shapes stand and are journaled.
 Tell the user where the plan was written, invite review and revisions, and offer the commit (phrasing yours); wait for the response.
 Changes requested means edit and re-run the self-review. Never commit without the offer being accepted.
 

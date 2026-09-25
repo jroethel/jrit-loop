@@ -88,6 +88,7 @@ Read the source plan and everything it points to, and extract:
 - **Per-unit model hints**: what the human plan assigned (often "Opus for everything"); you re-derive these in Step 2, not copy them.
 - **Prompt templates**: the paste-blocks; these become subagent prompts (background-agent) or manifest specs (ringer).
 - **Human checkpoints**: places the plan says the human reviews or approves; these survive conversion, they do not disappear.
+  A task the plan's Run shape section marks human is one of them: that shape is the user's decision, inherited, never re-derived.
 - **Shared state**: log files every session appends to, branches, checklists; these are the parallelism hazards.
 - **Failure policy**: retry limits and escalation targets.
 
