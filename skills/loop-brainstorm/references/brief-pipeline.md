@@ -13,6 +13,11 @@ Before proposing, name each candidate's enabling assumptions about the outside w
 A negative about the external ecosystem ("no plugin exists", "X isn't supported") cannot kill or park a candidate until checked against the current ecosystem this session, dated; local absence is never evidence of world absence.
 Score research inputs by transferable mechanism, not topic overlap.
 
+When you delegate exploration to subagents, the prompt you write is the ceiling on what they can find.
+Every exploratory subagent prompt presents its candidate set as explicitly non-exhaustive, tells the subagent to survey its own environment (available skills and tools, installed CLIs) and propose options outside the set, and licenses it to challenge the framing.
+Never hand an exploratory subagent a closed option set or a two-way choice such as "native primitives versus new infrastructure" that has no branch for an already-installed tool.
+Parallel subagents given the same constraint manufacture agreement: give them open or deliberately varied framings, and never read convergence under a shared constraint as independent signal.
+
 Propose 2-3 genuinely different approaches with trade-offs, lead with your recommendation, and say why.
 The chosen approach, the alternatives, the rationale, and the dated ecosystem facts it rests on all go in the brief; decisions without recorded rationale get relitigated.
 
