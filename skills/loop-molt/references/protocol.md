@@ -51,6 +51,7 @@ Choreography verdicts rest on the model notes, so each choreography finding cite
 Offline, the last download serves; with no download at all, every dependent verdict is marked unverified.
 
 Date-stamp the snapshot; it is the evidence base and its expiry. After the first audit, the drift ledger lets the next one diff from the last snapshot instead of re-researching from zero.
+An artifact's last ledger entry is found in lookup order: the artifact repo ledger, then the fallback ledger, then any legacy ledger linked from the first fallback entry.
 
 ### 1. Constraint register FIRST (the C1 lesson)
 
@@ -115,9 +116,37 @@ This requires the artifact to HAVE executable checks; an artifact with no checks
 Fallback for a checkless artifact: delete the block, run the artifact on one real task, compare output against a pre-deletion run - weaker certainty, still workable.
 Per-line tiebreaker, from the research: "would removing this cause a mistake? If not, cut it."
 
-### 5. Emit a drift ledger line (and, first time, a principles sheet)
+### 5. Emit the findings report and the drift ledger entry (and, first time, a principles sheet)
 
-Append to a small ledger (per artifact or per repo): date, harness snapshot version, blocks deleted by bin, blocks kept as policy, constraints re-confirmed.
+Every run writes two artifacts: a findings report and one appended drift ledger entry.
+
+**Findings report.** A report named `YYYY-MM-DD.<slug>.md` is written to the host's runs folder (the wrapper names it).
+It opens with the header lines `Artifact:`, `Run date:`, `Target model:`, `Evidence used:`, `Harness corpus:`, `Model notes:`, and `Ledger entry:`.
+The `Target model:` header lists every named model separated by semicolons, with one `Model notes:` header line per model.
+The body carries exactly four class headings - `## Deletions`, `## Conflicts`, `## Rewrites`, and `## Additions` - and a class with nothing to report says "None found."
+Each finding is a `### ` block carrying `Block:`, `Evidence:`, and `Proposed change:`, plus where they apply `Subtraction test:`, `Route: generator`, `Owner question:`, `Owner answer:`, `Arm:`, `Behavior shift:`, and `Reverse test:`.
+Every finding carries an `Evidence:` line in one of these forms: `Evidence: <harness file> at v<version>; index date <YYYY-MM-DD>`, `Evidence: <model-notes file> (<source URL>), fetched <YYYY-MM-DD>, sha256 <hex>`, `Evidence: artifact text only`, or `Evidence: memory, unverified`.
+A report that quotes the em dash character from an audited file writes the literal text U+2014 instead of the character.
+A finding on a generated artifact is never applied in place; route to its generator, recorded as a `Route: generator (<generator name>)` line.
+
+**Drift ledger.** The ledger lives in the audited artifact's repo at `docs/molt-ledger.md`; when the artifact has no repo, or its repo forbids a ledger, the entry goes to the host's fallback ledger instead (the wrapper names it).
+A repo forbids a ledger when a CI or sweep script in that repo names molt-ledger.md.
+One entry is appended after every run, never rewritten, in this form:
+
+```text
+## YYYY-MM-DD - <artifact path>
+- Harness snapshot: <harness version, date, live probes run>
+- Evidence used: <one or more of: semantic index, grep, model notes, memory>
+- Harness corpus: <source> at v<version>; index date <YYYY-MM-DD> (or: none, memory, unverified)
+- Model notes: <target model>; <notes file>; <source URL>; fetched <YYYY-MM-DD>; sha256 <hex> (or: none, memory, unverified; one line per model)
+- Deleted: <bin> N (...), <bin> N (...)
+- Kept as policy: N (invariant each protects)
+- Premises: <verified / rewritten in place / re-confirmed as constraint>
+- Constraints re-confirmed: <list>
+- Reverse test: <per addition: kept or dropped; arm A n runs, scores; arm B n runs, scores; scoring method> (or: none)
+- Findings report: <report path>
+```
+
 On a first audit of a principles-less artifact, also emit the derived invariants as that artifact's starter principles sheet.
 The next audit diffs from this known point instead of re-deriving everything.
 

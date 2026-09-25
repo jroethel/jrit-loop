@@ -4,7 +4,8 @@ description: >
   Audit any instruction-prose artifact - a SKILL.md, a CLAUDE.md block, an operating manual, a
   run-book - against a dated snapshot of what the harness now does natively, so plumbing gets
   deleted and policy survives. Classifies each block into four bins - plumbing, policy, premise,
-  choreography - emits deletions plus a drift ledger line, and converges structural findings into a brief.
+  choreography - and emits findings in four classes - deletions, conflicts, rewrites, and additions -
+  plus a drift ledger entry, and converges structural findings into a brief.
   Triggers on "molt", "harness drift", "audit this skill against the harness", "re-evaluate this
   prose against what the harness now does", and /loop-molt.
 ---
@@ -48,12 +49,14 @@ Full procedure and rationale live in `references/protocol.md`; the pointers belo
    Kept POLICY blocks are then rewritten to the wording standard defined in `references/protocol.md` step 3.
 3b. **Gap scan** - check the artifact against each documented behavior change in the target model's notes; a gap becomes a proposed addition kept only through the reverse subtraction test of `references/protocol.md` step 3b (arm A: artifact as is, arm B: artifact plus the addition, three or more runs per arm).
 4. **Test by subtraction** - delete the block, run the artifact's existing checks plus one real task, keep the deletion only if nothing degrades; a checkless artifact gets a check first (weaker fallback: compare one real task to a pre-deletion run).
-5. **Emit the drift ledger line** - append one entry to `docs/molt-ledger.md` (`## YYYY-MM-DD - <artifact path>`: date, harness snapshot, blocks deleted by bin, blocks kept as policy, constraints re-confirmed); on a first audit of a principles-less artifact, also emit its derived invariants as a starter principles sheet.
+5. **Emit the findings report and the drift ledger entry** - every run writes a findings report and appends one drift ledger entry.
+   The report's shape, the ledger home, and every field both carry are defined in `references/protocol.md` step 5; the wrapper names the host's runs folder and fallback ledger.
+   On a first audit of a principles-less artifact, also emit its derived invariants as a starter principles sheet.
 
 ## Workflow: inline vs. brief
 
 - **Small findings** (block deletions, single-file rewrites) apply inline via the subtraction test
-  with a `docs/molt-ledger.md` line, same session.
+  with a findings report and drift ledger entry per `references/protocol.md` step 5, same session.
 - **Structural findings** (skill merges, gates-to-hooks, re-homing) converge through the shared
   pipeline at `references/brief-pipeline.md` into a brief and ride
   the normal chain: /loop-plan -> /loop-drive -> /loop-review. No audit content is
@@ -73,3 +76,5 @@ This section holds this host's concrete paths and commands for the portable prot
 - Model-notes folder: `~/.config/jrit/molt/model-notes/<model>.md`, one downloaded prompting page per model.
 - Model-notes download: `curl -sfL https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-<model>.md -o ~/.config/jrit/molt/model-notes/<model>.md`.
 - Non-Anthropic model log: `~/repos/ringer/docs/MODEL-NOTES.md`.
+- Fallback ledger: `~/.config/jrit/molt/molt-ledger.md`, used when the audited artifact has no repo or its repo forbids a ledger.
+- Runs folder: findings reports land at `~/.config/jrit/molt/runs/YYYY-MM-DD.<slug>.md`.

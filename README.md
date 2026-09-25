@@ -29,7 +29,7 @@ npx skills@1.5.26 add jroethel/jrit-loop
 | loop-drive      | Orchestrate a plan's execution step by step, routing each task to a capable worker session.               |
 | loop-review     | Run a two-axis review, spec and standards, of the work since a fixed point you name.                      |
 | loop-improve    | Audit the repo and its tracker lanes, then converge the worthwhile findings into one brief.               |
-| loop-molt       | Audit instruction prose against what the harness now does natively, deleting plumbing and keeping policy. |
+| loop-molt       | Audit prose against harness and model evidence, emitting deletions, conflicts, rewrites, and additions.   |
 | loop-track      | Keep the repo's own issue tracker as the execution ledger for loop-driven work.                           |
 | loop-auto       | Set or check the chain autonomy knob and apply the four gate classes for autonomous runs.                 |
 | loop-setup      | Initialize a repo with the config and tracker layout the loop skills expect.                              |
