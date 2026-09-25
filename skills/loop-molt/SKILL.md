@@ -22,7 +22,7 @@ auditing - this SKILL.md is the thin wrapper, the protocol is the method.
 
 ## The one-line test
 
-Per block of prose: **"would the harness or a current frontier model do this unprompted, today?"**
+Per block of prose: **"would the harness or the target model do this unprompted, today?"**
 Not "is this correct?" - correct-but-native is still deletable. Prose describing HOW to do
 mechanics is suspect; prose describing WHAT MUST BE TRUE is policy.
 
@@ -38,8 +38,10 @@ Full procedure and rationale live in `references/protocol.md`; the pointers belo
 
 0. **Refresh ground truth** - never audit against remembered capability; thin refresh (changelog + one live probe of a load-bearing claim) per artifact, deep refresh (full research pull) for a whole-stack recalibration.
    The snapshot includes the harness instruction corpus pinned to the running harness version (protocol step 0).
+   The second evidence source is the target model's prompting notes, the model notes that ground choreography verdicts.
    Date-stamp the snapshot - it is the evidence base and its expiry.
 1. **Constraint register FIRST**`[gate:ASK]` - before classifying anything, ask the owner which design choices are deliberate standing constraints (portability, provider mix, cost, compliance) versus historical accident. Mandatory and ASK-class: never classify a premise as expired without it (a constraint misread as stale nearly flipped three recommendations); deliberate constraints are kept AND labeled so the next audit does not re-litigate them.
+   The register also names the target model, the model that will read the artifact, never assumed.
 2. **Inventory** - break the artifact into blocks (each instruction, gate, step, or embedded claim is one unit); for a skill family, inventory duplication too (a narrative in N places counts once, then N-1 deletions).
 3. **Classify** - sort every block into the four bins using the reference's definitions and policy-membership test; an expired premise is rewritten in place (never a bolted-on correction), a deliberate constraint kept and labeled.
 4. **Test by subtraction** - delete the block, run the artifact's existing checks plus one real task, keep the deletion only if nothing degrades; a checkless artifact gets a check first (weaker fallback: compare one real task to a pre-deletion run).
@@ -65,3 +67,6 @@ This section holds this host's concrete paths and commands for the portable prot
 - Local catalog checkout: `~/repos/claude-code-system-prompts`.
 - Pinned read: `git -C ~/repos/claude-code-system-prompts grep -n -i '<phrase>' v<version> -- system-prompts`, and for the index date `git -C ~/repos/claude-code-system-prompts log -1 --format=%cs v<version>`.
 - Optional semantic index: the qmd collection `piebald-ai`, which indexes the catalog head, so confirm every hit in the pinned tag.
+- Model-notes folder: `~/.config/jrit/molt/model-notes/<model>.md`, one downloaded prompting page per model.
+- Model-notes download: `curl -sfL https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-<model>.md -o ~/.config/jrit/molt/model-notes/<model>.md`.
+- Non-Anthropic model log: `~/repos/ringer/docs/MODEL-NOTES.md`.

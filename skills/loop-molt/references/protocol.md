@@ -9,7 +9,7 @@ Applies to: SKILL.md files, CLAUDE.md blocks, operating manuals, run-books - any
 
 ## The one-line test
 
-Per block of prose, ask: "would the harness or a current frontier model do this unprompted, today?"
+Per block of prose, ask: "would the harness or the target model do this unprompted, today?"
 Not "is this correct?" - correct-but-native is still deletable.
 Prose describing HOW to do mechanics is suspect; prose describing WHAT MUST BE TRUE is policy.
 
@@ -40,11 +40,22 @@ With no corpus at hand, fall back to memory and mark every dependent verdict unv
 The corpus never ships with the skill; fetch it from the catalog named above.
 Which input serves which finding class is tabulated in `references/evidence.md`.
 
+**Model evidence.** The target model's documented behavior comes from Anthropic's per-model prompting pages, named by the upstream URL pattern `https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-<model>.md`.
+Each page serves Markdown when .md is appended to its URL, so the notes are read as plain prose.
+A page is downloaded once per model into the model-notes folder the host names, and its fetch date is the file's modification time.
+Refresh is manual: the owner re-downloads a page when it changes, and the audit only reads the copy already on disk.
+Only the parts about prose responses bear on the audit; API-integration mechanics such as request parameters and tool schemas are out of scope.
+Each page is a delta against its predecessor, so the download follows the chain back to the model the artifact was last molted against.
+A non-Anthropic worker model takes its evidence from whatever dated model log the stack keeps for it, else from memory marked unverified.
+Choreography verdicts rest on the model notes, so each choreography finding cites the page it relies on and that page's fetch date.
+Offline, the last download serves; with no download at all, every dependent verdict is marked unverified.
+
 Date-stamp the snapshot; it is the evidence base and its expiry. After the first audit, the drift ledger lets the next one diff from the last snapshot instead of re-researching from zero.
 
 ### 1. Constraint register FIRST (the C1 lesson)
 
 Before classifying anything, ask the owner which design choices are deliberate standing constraints (portability, provider mix, cost, compliance) versus historical accident.
+The register also records which model will read this artifact - the target model or models - as the owner states it, never assumed.
 Never classify a premise as expired without this step; this session initially misread "/workflows off" as a stale premise when it was a live portability requirement, and the reversal changed three recommendations.
 
 ### 2. Inventory
@@ -59,7 +70,7 @@ For a skill family, also inventory duplication (the same narrative stated in N p
 | PLUMBING     | Mechanics the harness now performs unprompted       | Delete, or one pointer        |
 | POLICY       | Discipline the harness will not impose on its own   | Keep; sharpen to outcomes     |
 | PREMISE      | An assumption about the world or the harness        | Verify by a second route      |
-| CHOREOGRAPHY | Step-by-step behavior a frontier model does by      | Delete via subtraction test   |
+| CHOREOGRAPHY | Step-by-step behavior the target model does by      | Delete via subtraction test   |
 |              | judgment (probe names, question cadences)           |                               |
 
 Premise sub-rule: expired premise gets rewritten in place (never a bolted-on correction); a deliberate constraint (from step 1) gets kept AND labeled as a constraint so the next audit does not re-litigate it.
