@@ -6,7 +6,8 @@ cd "$(dirname "$0")/.." || { echo "FAIL: cannot reach the repo root" >&2; exit 1
 
 fail() { echo "CONSUMER-SWEEP FAIL: $1" >&2; exit 1; }
 
-strays=$(find . -path ./.git -prune -o \( -name conversation-archive.md -o -name learning_guide.html -o -name molt-ledger.md -o -path './docs/sessions/*' -o -path './docs/handoffs/*' -o -path './logs/*' -o -path './.scratch/*' -o -path './docs/reviews/*' \) -print)
+# docs/handoffs/ and docs/reviews/ are not swept: this repo dogfoods the loop, and docs/loop/pointer.md declares them as pointer-declared homes (owner ruling 2026-09-25).
+strays=$(find . -path ./.git -prune -o \( -name conversation-archive.md -o -name learning_guide.html -o -name molt-ledger.md -o -path './docs/sessions/*' -o -path './logs/*' -o -path './.scratch/*' \) -print)
 [ -z "$strays" ] || fail "consumer-generated session-history artifacts must not ship:
 $strays"
 
