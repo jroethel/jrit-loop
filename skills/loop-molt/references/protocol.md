@@ -62,6 +62,10 @@ Never classify a premise as expired without this step; this session initially mi
 
 Break the artifact into blocks: each instruction, gate, enumerated step, or embedded claim is one classifiable unit.
 For a skill family, also inventory duplication (the same narrative stated in N places counts once, then N-1 deletions).
+The inventory looks for contradiction as well as duplication: two blocks that cannot both be true at the same time.
+When the audit covers more than one file, duplication and contradiction are inventoried across the files, not only within each.
+When two blocks collide, a conflicting pair goes to the owner as a constraint-register question, an ASK-class gate: molt never picks a winner between conflicting instructions.
+The pairs from one run are collected and asked together once the findings are drafted, one question set per run, not one stop per pair.
 
 ### 3. Classify every block into one of four bins
 
