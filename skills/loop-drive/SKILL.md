@@ -172,6 +172,8 @@ Ringer's own footguns (deliverable loss on a passing worktree, gitignored output
 
 - Forbid commit attribution explicitly: the harness's attribution reminder injects a Co-Authored-By line into worker commits unless the implementer prompt forbids it; worktree-transport workers do not commit at all, so this bites background-agent units.
 - No GNU-only flags in any command, check, or embedded how-to-run; portability is a standing rule, never a per-unit hope.
+- Style rules bind human-read artifacts only: classify each artifact a unit produces as human-read (a deliverable a person reads) or machine-read (the resume pointer, the structured-output result, unit logs), and compile any style constraint (sentence-per-line, dash, table style) into worker specs and validator criteria for the human-read set alone.
+  A source-plan constraint phrased over every Markdown file is narrowed this way, noted once as a deviation.
 
 **Both transports:** the validator/review stance is adversarial and evidence-first (P2: worker self-reports are worthless).
 Judge the raw evidence (the diff, the executed check output, the artifact), and ignore the implementer's own narrative of what it did.
@@ -243,7 +245,7 @@ The file carries four required headings, in this order and verbatim:
 ```
 
 `## Recent artifacts` lists the unit's brief, plan, review docs, and every doc the unit itself created, each as a repo-relative path gathered from the unit's own run rather than from memory.
-The file is `git add`ed and committed in the unit's closing commit, and no human asks for it.
+The file is `git add`ed and committed in the unit's closing commit, and no human asks for it; it is machine-read, so style rules never bind it (see the standing house rules in Step 4).
 Compile this deliverable into every worker prompt and manifest spec from Step 4, so the worker writes it, not the orchestrator.
 For worktree-transport units, the resume pointer's path also joins the unit's ownership list, so it travels in the exported patch and lands in the unit's closing commit.
 

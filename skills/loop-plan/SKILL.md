@@ -91,6 +91,7 @@ For a wide refactor, expand-contract is the reference pattern: land the new stru
 
 Save to `<plans-home>/YYYY-MM-DD.<tokens>.<topic>-plan.md`, where `<plans-home>` is the `plans-home:` key from `docs/loop/pointer.md`, defaulting to `docs/plans/` when the key is absent.
 Follow the user's global markdown style instructions already loaded in this session's context, when any exist.
+When a global constraint is a style rule (sentence-per-line, dash, or table style), scope it to human-read deliverables and name the exemption in the constraint line: machine-read run artifacts - resume pointers, worker result files, structured logs - are exempt.
 When the work belongs to a logged tracker item, include its token segment(s) (e.g. .I6 for issue 6, .B4 for backlog item 4, .R1 for roadmap item 1, .W3 for wayfinder ticket 3); when the item is not yet logged, omit the token segments entirely and insert them when the item is created.
 
 **Header, in order:**
