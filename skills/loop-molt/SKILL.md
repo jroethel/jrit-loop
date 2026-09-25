@@ -74,7 +74,7 @@ This section holds this host's concrete paths and commands for the portable prot
 - Catalog setup (once): `git clone https://github.com/Piebald-AI/claude-code-system-prompts ~/repos/claude-code-system-prompts`; the protocol falls back to memory, verdicts unverified, when the checkout is absent.
 - Catalog refresh (after a harness upgrade): `git -C ~/repos/claude-code-system-prompts fetch --tags`, so the tag matching the new version exists locally.
 - Pinned read: `git -C ~/repos/claude-code-system-prompts grep -n -i '<phrase>' v<version> -- system-prompts`, and for the index date `git -C ~/repos/claude-code-system-prompts log -1 --format=%cs v<version>`.
-- Optional semantic index: the qmd collection `piebald-ai`, which indexes the catalog head, so confirm every hit in the pinned tag.
+- Recommended semantic index (validation and exploration): the qmd collection `piebald-ai`, which indexes the catalog head, so confirm every hit in the pinned tag.
 - Index maintenance (owner-run, never during an audit): `qmd update --pull && qmd embed -c piebald-ai` re-pulls and re-embeds the collection.
 - Model-notes folder: `~/.config/jrit/molt/model-notes/<model>.md`, one downloaded prompting page per model.
 - Model-notes download: `curl -sfL https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-<model>.md -o ~/.config/jrit/molt/model-notes/<model>.md`.
