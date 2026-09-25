@@ -75,6 +75,7 @@ This section holds this host's concrete paths and commands for the portable prot
 - Optional semantic index: the qmd collection `piebald-ai`, which indexes the catalog head, so confirm every hit in the pinned tag.
 - Model-notes folder: `~/.config/jrit/molt/model-notes/<model>.md`, one downloaded prompting page per model.
 - Model-notes download: `curl -sfL https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-<model>.md -o ~/.config/jrit/molt/model-notes/<model>.md`.
+- File-name rule: a page at https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/<slug> is saved as <slug>.md with any leading prompting- dropped.
 - Non-Anthropic model log: `~/repos/ringer/docs/MODEL-NOTES.md`.
 - Fallback ledger: `~/.config/jrit/molt/molt-ledger.md`, used when the audited artifact has no repo or its repo forbids a ledger.
 - Runs folder: findings reports land at `~/.config/jrit/molt/runs/YYYY-MM-DD.<slug>.md`.

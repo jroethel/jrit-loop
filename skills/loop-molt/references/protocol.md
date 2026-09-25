@@ -81,7 +81,7 @@ The pairs from one run are collected and asked together once the findings are dr
 Sharpen means rewriting a kept POLICY block so it states the outcome it protects with plain volume instead of all-caps emphasis and with the reason next to each rule.
 The standard asks for no numeric output caps, positive statements, except where the failure is known to recur, and prose, not bullet walls.
 A sharpened artifact obeys its own style rules, and this paragraph is written to that standard on purpose.
-The wording source is Anthropic's prompting best-practices page, https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md (claude-prompting-best-practices), and these six points are its full restatement; anything finer is read from the page itself, not paraphrased here.
+The wording source is Anthropic's prompting best-practices page, https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md (claude-prompting-best-practices), and these six points are all this protocol takes from it; anything finer is read from the page itself, not paraphrased here.
 The owner's banned-token list enters through the constraint register, and jrit-core's banned-token list can supply it as data.
 
 Premise sub-rule: expired premise gets rewritten in place (never a bolted-on correction); a deliberate constraint (from step 1) gets kept AND labeled as a constraint so the next audit does not re-litigate it.
