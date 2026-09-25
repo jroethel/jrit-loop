@@ -113,8 +113,9 @@ Roster: background-agent workers are sonnet, opus, and haiku; Fable is orchestra
 Quota preference: execution typing leans to the flat-rate `claude-zai` lane when evidence ties or is thin, keeping Anthropic quota for orchestration, review gates, and judgment; this is a tie-break, not a tier.
 Taste flag: units with aesthetic acceptance criteria get flagged in the routing table and offered the per-unit engine ask despite any default.
 
-Give every unit a `task_type` from ringer's canonical vocabulary (code-feature, code-fix, code-review, research, persona-review, site-build, image-gen, docs, probe, bakeoff, ...).
+Give every unit a `task_type`; the field is free-form, and the suggested vocabulary's single home is ringer's README - never restate the list here.
 The task_type drives scoreboard routing and must be set even for background-agent units so the choice is legible.
+When ringer's optional Jev task_type feature is on, lint prints one `jev:` line per task comparing Jev's pick with the hand label; treat a disagreement as a re-check signal on the hand label, not an authority, and read a `keeps hand (hand-outside-vocabulary)` line as expected for a type outside Jev's narrower closed set, not actionable.
 
 Effort: cap everything at **high**; exceeding high requires an explicit orchestrator decision recorded in the run log.`[gate:STOP]`
 Use medium for units that are thin, well-referenced, or mechanical; high where numeric correctness, quirk preservation, or contract design is at stake.
@@ -166,6 +167,11 @@ Ringer's own footguns (deliverable loss on a passing worktree, gitignored output
   Prove non-vacuity with a committed expected-fail fixture, never a live mutate-and-restore probe: a check must never mutate the working tree to demonstrate it can fail and then restore it, because that authors dirt the protocol then trips on and can corrupt the tree if the run dies mid-probe.
   This proof is run on demand only, never a per-run obligation: it is exercised when non-vacuity is in doubt, not required of every check on every run.
   The expected-fail fixture convention - its naming, its location, and how a run references it - is governed by the ringer skill's "Check-writing rules" section, which is its single home; until that convention is authored there, skip the non-vacuity proof rather than fall back to a live probe.
+
+**Both transports, standing house rules (MODEL-NOTES 2026-09-17 signal):**
+
+- Forbid commit attribution explicitly: the harness's attribution reminder injects a Co-Authored-By line into worker commits unless the implementer prompt forbids it; worktree-transport workers do not commit at all, so this bites background-agent units.
+- No GNU-only flags in any command, check, or embedded how-to-run; portability is a standing rule, never a per-unit hope.
 
 **Both transports:** the validator/review stance is adversarial and evidence-first (P2: worker self-reports are worthless).
 Judge the raw evidence (the diff, the executed check output, the artifact), and ignore the implementer's own narrative of what it did.
@@ -239,6 +245,7 @@ The file carries four required headings, in this order and verbatim:
 `## Recent artifacts` lists the unit's brief, plan, review docs, and every doc the unit itself created, each as a repo-relative path gathered from the unit's own run rather than from memory.
 The file is `git add`ed and committed in the unit's closing commit, and no human asks for it.
 Compile this deliverable into every worker prompt and manifest spec from Step 4, so the worker writes it, not the orchestrator.
+For worktree-transport units, the resume pointer's path also joins the unit's ownership list, so it travels in the exported patch and lands in the unit's closing commit.
 
 Design for interruption: the orchestrator cannot see the user's remaining quota, so the loop must die safely at any moment.
 Implementers commit their results and log before returning; the plan contains a verbatim resume prompt plus a reconciliation procedure that relaunches (never resumes) half-done units.

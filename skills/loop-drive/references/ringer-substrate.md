@@ -16,7 +16,7 @@ One task per unit. Each task carries:
 
 - `key`: unit id (unique; becomes the task dir and worktree name).
 - `engine` + `model`: the routing decision from Step 2 (`model` fills the engine's `{model}` placeholder; omit to take the engine default).
-- `task_type`: from the canonical vocabulary (code-feature, code-fix, code-review, research, persona-review, site-build, image-gen, docs, probe, bakeoff, ...). Untyped tasks teach the scoreboard nothing and draw a lint nudge.
+- `task_type`: free-form; the suggested vocabulary's single home is ringer's README. Untyped tasks teach the scoreboard nothing and draw a lint nudge; with ringer's optional Jev task_type feature on, lint also prints a per-task `jev:` comparison line (a disagreement is a re-check signal on the hand label, not an authority).
 - `spec`: self-contained. Everything the worker needs, no pointer specs, an ownership list of every file it may touch, an embedded how-to-run, and the exact output contract.
 - `expect_files`: the deliverables, so the results page shows the right work.
 - `check`: prints WHY it fails, verifies substance not just presence, strict on substance and tolerant on format (P14).
@@ -27,7 +27,7 @@ Run-level: `run_name` (the SAME across every wave of the build), `workdir`, `wor
 
 ## Isolation and the patch-export pattern
 
-Guidance current as of 2026-09-15 against ringer at `~/repos/ringer` (lint rule `ringer.py:1830`).
+Guidance current as of 2026-09-24 against ringer at `~/repos/ringer` (the lint rule is `instructs_git_commit` in `ringer.py`; cite it by name, since line numbers drift).
 Run-level `"worktrees": true` gives each task an isolated git worktree, so you do not re-specify per-task isolation.
 But a passing task's worktree is DELETED, and worker commits die with it.
 Ringer's lint enforces this: any spec instructing `git commit` under worktrees is hard-blocked, so the worker must leave changes uncommitted and the check exports the diff.

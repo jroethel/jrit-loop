@@ -37,6 +37,6 @@ If the Step 0 capability probe reported ringer absent on this machine, skip tier
 
 **Tie-break.** The flat-rate `claude-zai` (GLM) lane takes ties or thin evidence, keeping Anthropic quota for orchestration and gates; this is a tie-break, not a tier.
 
-**Promotion ladder.** Prior semantics follow the ringer ladder: a model is untested until it has scoreboard rows, on probation through its first rows, and proven at 3+ scoreboard rows.
+**Promotion ladder.** Prior semantics follow the ringer ladder: a model is untested until it has scoreboard rows, on probation through its first rows, and proven for a task_type only at 3+ tasks with `first_try_pass_rate >= 0.67` - the row count alone never promotes.
 
 **Roster.** Fable is orchestrator-tier only and never a worker; GLM and codex run only via ringer; sonnet, opus, and haiku are the Agent-tool workers.
