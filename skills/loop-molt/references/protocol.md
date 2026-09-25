@@ -83,6 +83,21 @@ A principles sheet is an accelerator, never a prerequisite.
 Policy examples from the source session: checks-or-stall, validator-never-fixes contracts, per-unit cost routing tables, risk-classed gates, run-state formats, check custody.
 Plumbing examples: fan-out mechanics, background execution, notifications, session resume - all prose re-describing what the harness already does.
 
+### 3b. Gap scan against the target model's behavior changes
+
+Subtraction (step 4) catches prose the artifact should lose; the gap scan catches the opposite drift, a documented behavior change in the target model that the artifact fails to exploit.
+Check the artifact against each documented behavior change in the target model's notes (the model evidence of step 0), and where the artifact ignores a change the notes describe, record a gap.
+A gap becomes a proposed addition tied to a documented behavior shift, citing the model-notes version and fetch date the shift came from.
+When the constraint register names more than one target model, the scan runs once per named model, and each addition names the model it targets.
+
+A proposed addition is kept only through a reverse subtraction test, run before the addition enters the artifact.
+Arm A runs the artifact as is; arm B runs the artifact plus the addition, both arms on the same one real task.
+A single run per arm cannot separate improvement from run-to-run variance and must never decide the keep, so the test uses three or more runs per arm.
+Every run is scored against a binary checklist tied to the named behavior shift, with the checklist written before the runs and the keep rule fixed before the runs - a stated threshold of arm B over arm A.
+The pairing is deliberate: an "improves" left undefined until after the scores exist is LLM-as-judge, and the checklist may not change after the first run - anything noticed mid-test joins the next cycle's checklist, never the current one.
+The drift ledger records the run count and scores per arm, the checklist, the keep rule, and the verdict.
+An addition not yet reverse-tested is reported as proposed, never as kept.
+
 ### 4. Test by subtraction
 
 Delete the block, run the artifact's existing checks plus one real task, keep the deletion if nothing degrades.
@@ -100,7 +115,7 @@ The next audit diffs from this known point instead of re-deriving everything.
 
 Each audited artifact converges toward a policy sheet: constraints, contracts, thresholds, formats - riding on native mechanics.
 Policy survives harness versions; plumbing has a shelf life of about one release cycle.
-An artifact whose audit deletes nothing two cycles running is done molting; an artifact that only ever grows has never been audited.
+Convergence is net change within a band per cycle: deletions and additions roughly balancing, every addition tied to a dated model-notes version from the gap scan (step 3b); an artifact that only ever grows has never been audited.
 
 ## Where molt sits in the chain
 

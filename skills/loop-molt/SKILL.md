@@ -44,6 +44,7 @@ Full procedure and rationale live in `references/protocol.md`; the pointers belo
    The register also names the target model, the model that will read the artifact, never assumed.
 2. **Inventory** - break the artifact into blocks (each instruction, gate, step, or embedded claim is one unit); for a skill family, inventory duplication too (a narrative in N places counts once, then N-1 deletions).
 3. **Classify** - sort every block into the four bins using the reference's definitions and policy-membership test; an expired premise is rewritten in place (never a bolted-on correction), a deliberate constraint kept and labeled.
+3b. **Gap scan** - check the artifact against each documented behavior change in the target model's notes; a gap becomes a proposed addition kept only through the reverse subtraction test of `references/protocol.md` step 3b (arm A: artifact as is, arm B: artifact plus the addition, three or more runs per arm).
 4. **Test by subtraction** - delete the block, run the artifact's existing checks plus one real task, keep the deletion only if nothing degrades; a checkless artifact gets a check first (weaker fallback: compare one real task to a pre-deletion run).
 5. **Emit the drift ledger line** - append one entry to `docs/molt-ledger.md` (`## YYYY-MM-DD - <artifact path>`: date, harness snapshot, blocks deleted by bin, blocks kept as policy, constraints re-confirmed); on a first audit of a principles-less artifact, also emit its derived invariants as a starter principles sheet.
 
