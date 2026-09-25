@@ -1,6 +1,6 @@
 # jrit-loop
 
-jrit-loop is a Claude Code plugin of eleven prose skills for driving multi-step work through your repo's own issue tracker.
+jrit-loop is a Claude Code plugin of ten prose skills for driving multi-step work through your repo's own issue tracker.
 A raw idea goes in one end, and brainstorming, planning, execution, review, and tracking come out the other as ordinary files and tracker issues you already know how to read.
 
 ## Install
@@ -20,7 +20,7 @@ Or with the `skills` CLI:
 npx skills@1.5.26 add jroethel/jrit-loop
 ```
 
-## The eleven skills
+## The ten skills
 
 | Skill           | What it does                                                                                              |
 | --------------- | --------------------------------------------------------------------------------------------------------- |
@@ -29,7 +29,6 @@ npx skills@1.5.26 add jroethel/jrit-loop
 | loop-drive      | Orchestrate a plan's execution step by step, routing each task to a capable worker session.               |
 | loop-review     | Run a two-axis review, spec and standards, of the work since a fixed point you name.                      |
 | loop-improve    | Audit the repo and its tracker lanes, then converge the worthwhile findings into one brief.               |
-| loop-molt       | Audit prose against harness and model evidence, emitting deletions, conflicts, rewrites, and additions.   |
 | loop-track      | Keep the repo's own issue tracker as the execution ledger for loop-driven work.                           |
 | loop-auto       | Set or check the chain autonomy knob and apply the four gate classes for autonomous runs.                 |
 | loop-setup      | Initialize a repo with the config and tracker layout the loop skills expect.                              |

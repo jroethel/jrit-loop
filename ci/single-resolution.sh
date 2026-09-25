@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ci/single-resolution.sh - after decommission (human checkpoint C3), each of the
-# eleven skill names must resolve from EXACTLY ONE location (criterion 12).
+# ten skill names must resolve from EXACTLY ONE location (criterion 12).
 # Run once per host that carried the symlink farm, at Task 14.
 #
 # Host record verified at write time, 2026-09-13, with 'ls ~/.claude/plugins/'
@@ -41,7 +41,7 @@ command -v jq >/dev/null 2>&1 || fail "jq is required by ci/single-resolution.sh
 
 RECORD="$HOME/.claude/plugins/installed_plugins.json"
 
-NAMES="handoff loop-auto loop-brainstorm loop-drive loop-improve loop-molt loop-plan loop-review loop-setup loop-track wayfinder"
+NAMES="handoff loop-auto loop-brainstorm loop-drive loop-improve loop-plan loop-review loop-setup loop-track wayfinder"
 
 if [ ! -f "$RECORD" ]; then
   echo "info: no installed-plugins record at $RECORD; the canonical installed location resolves for no name"

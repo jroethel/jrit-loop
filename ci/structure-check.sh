@@ -104,7 +104,6 @@ check_c() {
   }
   pair loop-review/references/reviewer-conduct-contract.md loop-drive/references/reviewer-conduct-contract.md
   pair loop-brainstorm/references/brief-pipeline.md loop-improve/references/brief-pipeline.md
-  pair loop-brainstorm/references/brief-pipeline.md loop-molt/references/brief-pipeline.md
   pair loop-brainstorm/references/tracker-scan.md loop-improve/references/tracker-scan.md
   pair loop-brainstorm/references/one-minute-test.md loop-drive/references/one-minute-test.md
   ok "C - duplicated references byte-identical:$pair_ok"

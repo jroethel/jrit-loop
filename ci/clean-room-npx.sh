@@ -20,7 +20,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)" || { echo "FAIL: cannot reach the repo 
 
 fail() { echo "CLEAN-ROOM-NPX FAIL: $1" >&2; exit 1; }
 
-NAMES="handoff loop-auto loop-brainstorm loop-drive loop-improve loop-molt loop-plan loop-review loop-setup loop-track wayfinder"
+NAMES="handoff loop-auto loop-brainstorm loop-drive loop-improve loop-plan loop-review loop-setup loop-track wayfinder"
 
 SANDBOX="$(mktemp -d)" || fail "mktemp -d failed"
 trap 'rm -rf "$SANDBOX"' EXIT

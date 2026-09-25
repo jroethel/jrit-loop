@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # tests/single-resolution-cases.sh - sandbox cases for ci/single-resolution.sh
 # after the skills-CLI (.agents) collapse amendment. Each case builds a throwaway
-# HOME, lays out all eleven names in one shape, runs the check, and asserts the
+# HOME, lays out all ten names in one shape, runs the check, and asserts the
 # exit code. Nothing outside the sandbox HOME is touched.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)" || { echo "FAIL: cannot reach repo root" >&2; exit 1; }
 CHECK="$REPO/ci/single-resolution.sh"
-NAMES="handoff loop-auto loop-brainstorm loop-drive loop-improve loop-molt loop-plan loop-review loop-setup loop-track wayfinder"
+NAMES="handoff loop-auto loop-brainstorm loop-drive loop-improve loop-plan loop-review loop-setup loop-track wayfinder"
 
 command -v jq >/dev/null 2>&1 || { echo "FAIL: jq required (ci/single-resolution.sh needs it)" >&2; exit 1; }
 

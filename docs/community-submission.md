@@ -14,13 +14,13 @@ Plugin name: jrit-loop
 Version: 0.1.0
 
 Description: The loop-stack toolkit: brainstorm, plan, drive, review, and track multi-step work through your repo's own issue tracker.
-Its eleven skills carry an idea from first brainstorm through planning, gated or autonomous execution, two-axis review, and tracker filing, with your repo's own tracker as the single source of state.
+Its ten skills carry an idea from first brainstorm through planning, gated or autonomous execution, two-axis review, and tracker filing, with your repo's own tracker as the single source of state.
 
 Requirements: `gh` (authenticated) for GitHub tracker mode, or `glab` (authenticated) for GitLab tracker mode; `jq` for GitLab mode.
 
 License: MIT
 
-## The eleven skills
+## The ten skills
 
 | Skill           | Line                                                                                                                                                                   |
 |-----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -29,7 +29,6 @@ License: MIT
 | loop-brainstorm | Think an idea through before any plan, PRD, or scaffolding exists, ending in a loop-ready idea brief.                                                                  |
 | loop-drive      | Orchestrate the execution of a multi-step plan, PRD, or run-book in a single frontier-model session instead of a human pasting prompts by hand.                        |
 | loop-improve    | Audit the repo for improvements and converge the ones worth doing into a single approved brief for planning.                                                           |
-| loop-molt       | Audit an instruction-prose artifact against a dated snapshot of what the harness now does natively, so plumbing gets deleted and policy survives.                      |
 | loop-plan       | Turn a brief, spec, or requirements into an executor-agnostic implementation plan consumable by loop-drive or any capable agent.                                       |
 | loop-review     | Run a two-axis review (Spec and Standards) of the diff since a user-supplied fixed point, with fresh-context subagents and disclosed sources.                          |
 | loop-setup      | Declare a repo's tracker mode once, write the two pointer docs, and wire the managed instructions into AGENTS.md.                                                      |

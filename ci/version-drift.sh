@@ -40,17 +40,17 @@ readme_v=$(grep -E '^<!-- jrit-loop-version: (.+) -->$' README.md | head -1 | se
 [ "$readme_v" = "$pv" ] || fail "version drift: README marker says $readme_v, plugin.json says $pv"
 echo "ok: README marker equals plugin.json version ($readme_v)"
 
-# --- 5. skills/ holds exactly eleven directories, each with a SKILL.md ---------
+# --- 5. skills/ holds exactly ten directories, each with a SKILL.md -----------
 shopt -s nullglob
 dirs=()
 for d in skills/*/; do
   dirs+=("$d")
 done
 count=${#dirs[@]}
-if [ "$count" -lt 11 ]; then
-  echo "skip: eleven-directory assertion ($count of 11 skill directories exist; hard once Task 9 lands)"
+if [ "$count" -lt 10 ]; then
+  echo "skip: ten-directory assertion ($count of 10 skill directories exist; hard once Task 9 lands)"
 else
-  [ "$count" -eq 11 ] || fail "skills/ holds $count directories; exactly eleven skills ship"
+  [ "$count" -eq 10 ] || fail "skills/ holds $count directories; exactly ten skills ship"
 fi
 missing=""
 for d in "${dirs[@]}"; do

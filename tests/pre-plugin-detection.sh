@@ -33,9 +33,8 @@ for name in loop-auto loop-brainstorm loop-drive loop-improve loop-plan loop-tra
     || fail "skills/$name/SKILL.md does not contain the D3 detection paragraph byte-for-byte"
 done
 
-# loop-review and loop-molt are exempt by D3: loop-review works on any repo
-# with zero setup, and loop-molt audits prose artifacts rather than repo state.
-for name in loop-review loop-molt; do
+# loop-review is exempt by D3: it works on any repo with zero setup.
+for name in loop-review; do
   file="skills/$name/SKILL.md"
   [ -f "$file" ] || fail "$file does not exist"
   ! contains_paragraph "$file" \
