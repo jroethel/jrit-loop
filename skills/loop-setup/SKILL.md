@@ -132,8 +132,9 @@ Render `docs/loop/pointer.md` and `docs/loop/conventions.md` from them using the
 Then handle the generated mirrors, preview-then-assent and never silent:
 
 1. List the files actually found - the three mirror files `ISSUES.md`, `BACKLOG.md`, and `WAYFINDER.md`, plus the one runtime state file `docs/chain-state.md` - with a count, for example "found 2: ISSUES.md, BACKLOG.md".
-2. State plainly that they are untracked and therefore unrecoverable once removed, and that they are deleted rather than frozen because the tracker's own UI is now the view.
-3. Delete them only after explicit assent.
+2. Check each found file with `git ls-files --error-unmatch <file>` and state plainly which are tracked and which are not: a tracked file survives in git history after removal, an untracked one is unrecoverable once removed.
+   Say too that they are deleted rather than frozen because the tracker's own UI is now the view.
+3. Delete them only after explicit assent, tracked files with `git rm` and untracked ones with plain `rm`.
    A decline leaves every file in place and ends the migration with nothing removed.
 
 Finally, leave `config/repo-state.md` and `config/conventions.md` in place for the human to remove.
