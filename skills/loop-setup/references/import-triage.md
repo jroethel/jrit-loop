@@ -15,7 +15,7 @@ Run the steps in order; blast radius grows down the list, and each step narrows 
 2. Classify each discrete item in each candidate: active work is an issue with no label, and a parked backlog item takes the `idea` label.
 3. Verify every item as outstanding or already-built against the codebase and git history; a dropped item, already-built or noise, carries disclosed evidence, a `file:line` or a commit.
 4. Present one batch disclosure table, then offer a per-candidate walkthrough for any item the human picks.
-5. On approval, file each outstanding item, archive each source doc, and write the record doc.
+5. On approval, file each outstanding item, archive each source doc that is not a living doc, and write the record doc.
 
 ## The batch disclosure table
 
@@ -48,7 +48,7 @@ In this order:
 1. File each outstanding item per the declared tracker mode: `gh issue create --label <label> --title <title> --body <body>` in github mode, `glab issue create --yes --label <label> --title <title> --description <body>` in gitlab mode, and in local mode append a new section to `docs/issues.md` per the grammar in `references/pointer-templates.md`, numbered from the `<!-- next-number: N -->` marker and with the marker bumped in the same write.
    The remote command prints the new issue number; capture it for the record doc.
    Pass the `idea` label for a parked backlog item and no label for active work.
-2. Archive each source doc to `docs/archive/`.
+2. Archive each source doc to `docs/archive/`, except a living doc, which stays where it is (see Living doc below).
    Use `git mv` when the file is tracked and plain `mv` otherwise.
 3. Write the D1 triage record doc described below.
 
@@ -66,7 +66,7 @@ Restart context: <one line>
 ```
 
 The verbatim prose lets the issue stand on its own after the source doc is archived.
-`Source doc:` points at the archived copy, `Imported:` is today's date, and `Restart context:` is the one line a future session needs to pick the work back up.
+`Source doc:` points at the archived copy (a living doc's own path, since it is never archived), `Imported:` is today's date, and `Restart context:` is the one line a future session needs to pick the work back up.
 
 ## The triage record doc (D1)
 
@@ -98,6 +98,13 @@ Merge into the one with the better restart context and drop the other.
 
 Decline the file and leave it where it is when it is reference material, a log, or a completed record.
 It will be offered again on the next run, and that repeat is the design speaking up about a live loose end, not a bug.
+
+### Living doc
+
+A living doc is a resume or status doc the owner still works from, such as a live `whats_next.md` resume pointer.
+File its outstanding items as usual, but never archive it, because moving it breaks the owner's restart workflow; its action in the disclosure table reads `file, keep (living)`.
+In the same disclosure, offer to append one line to it naming the filed issue numbers, and add that line only on assent.
+On a later run, an item it still carries that is already filed merges into that issue under the Merge rule, with the issue number as the drop's evidence.
 
 ### Titling
 

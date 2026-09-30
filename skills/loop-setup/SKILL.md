@@ -129,6 +129,9 @@ Detect the pre-plugin layout: `config/repo-state.md` exists and `docs/loop/point
 This skill owns the migration; the other loop skills detect the same shape and refuse to proceed silently, pointing here.
 Read the old file's `tracker:`, `rubix-autorun:`, `autonomy-default:`, and Lanes table.
 Render `docs/loop/pointer.md` and `docs/loop/conventions.md` from them using the templates in `references/pointer-templates.md`: `rubix-autorun:` and `autonomy-default:` keep their names and values, and each old lane becomes the tracker read named in the Lanes table, with no mirror.
+An old lane the template has no row for (seen in practice: Roadmap, Chain state, Sessions) is never dropped silently; name each one to the human with what becomes of it.
+Chain state's `docs/chain-state.md` is the runtime state file the mirror step below handles.
+Every other such lane is retired and its home left in place, and a home that holds content, such as a non-empty `ROADMAP.md`, is named as a candidate the import sweep scans rather than skips as a root project file.
 Then handle the generated mirrors, preview-then-assent and never silent:
 
 1. List the files actually found - the three mirror files `ISSUES.md`, `BACKLOG.md`, and `WAYFINDER.md`, plus the one runtime state file `docs/chain-state.md` - with a count, for example "found 2: ISSUES.md, BACKLOG.md".
