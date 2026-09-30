@@ -23,7 +23,7 @@ The principle IDs cited below (P2, P6, P7, P10, P11, P12, P14) carry short gloss
 ## Step boundary and entry points
 
 The driving session does not compile the plan inline.
-Steps 1-4 and Step 6 - extract the skeleton, assign roles and models, neutralize the hazards, convert the prompt templates, and emit the plan - are compiled by ONE fresh-context dispatch at the drive-compile dispatch role pin; cite the role pin by that name, never a bare model id mid-prose (the pin resolves to Opus, and this line is its single home).
+Steps 1-4 and Step 6 - extract the skeleton, assign roles and models, neutralize the hazards, convert the prompt templates, and emit the plan - are compiled by ONE fresh-context dispatch at the drive-compile dispatch role pin; cite the role pin by that name, never a bare model id mid-prose (its model lives in the Role pins table of `references/model-benchmarks.md`).
 The driving session keeps Step 0 (route and scope), a pin review of the compiled output against this skill's rules, the Step 5 gates, and the Step 7 launch.
 
 **Start from an existing `_loop.md`.**
@@ -33,7 +33,7 @@ When the orchestration plan already exists, skip compilation entirely and go str
 
 Nothing under `references/` is an always-read; each file is pulled at its trigger below, and an invocation whose path never fires a trigger reads none of them (molt verdict 2026-09-13; this block is the single home of the triggers).
 
-- `references/model-benchmarks.md`: read when a routing decision arises - Step 2 unit assignment, a runtime re-route at a gate, or human-paced per-unit model choice. Step 0 triage, a CHAT or DON'T BOTHER exit, and the pin review of an existing `_loop.md` do not read it.
+- `references/model-benchmarks.md`: read when a routing decision arises - Step 2 unit assignment, a runtime re-route at a gate, human-paced per-unit model choice, or resolving a role pin's model at dispatch. Step 0 triage, a CHAT or DON'T BOTHER exit, and the pin review of an existing `_loop.md` do not read it.
 - `references/ringer-substrate.md`: read when at least one unit takes the ringer transport; never read in degraded mode (ringer absent).
 - `references/harness-appendix-claude-code.md`: read when at least one unit takes the background-agent transport; it is the single home of this skill's harness-specific mechanics and the only loop-drive file that names a harness primitive.
 - `references/fable-guidelines.md`: read only in human-paced output mode, before drafting the run-book.
@@ -101,7 +101,7 @@ The loop is a three-tier structure regardless of transport:
 | Tier | Who | Does |
 |---|---|---|
 | Orchestrator | the main session | The wave loop, gates, merges, spec edits, escalation. Never implements. Reads logs, verdicts, and core diffs only, to preserve context. |
-| Validator | a fresh checker per unit (a subagent at the background-agent-validator role pin (resolves to Opus; this line is the pin's home), or an executed check plus optional review task) | Adversarial re-check of the implementer's claim against actual artifacts. Never fixes. |
+| Validator | a fresh checker per unit (a subagent at the background-agent-validator role pin (model per the Role pins table in `references/model-benchmarks.md`), or an executed check plus optional review task) | Adversarial re-check of the implementer's claim against actual artifacts. Never fixes. |
 | Implementer | a worker per unit (subagent, or manifest task) | The unit's actual work, test-first against its criteria. |
 
 Model choice is one chain for every unit, regardless of transport, and it follows the routing chain (`references/model-benchmarks.md`) - that single home carries the three-tier evidence chain, the `./ringer.py models --task-type` posterior with its MODEL-NOTES/AMENDMENTS-PENDING integrity read, the promotion ladder, the `claude-zai` tie-break, and the roster (P7: route by evidence, not vibes). Do not restate the chain here.
