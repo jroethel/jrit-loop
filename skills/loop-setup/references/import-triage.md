@@ -45,7 +45,7 @@ Approval covers the issue bodies the agent writes, not just the classification: 
 
 In this order:
 
-1. File each outstanding item per the declared tracker mode: `gh issue create --label <label> --title <title> --body <body>` in github mode, `glab issue create --label <label> --title <title> --body <body>` in gitlab mode, and in local mode append a new section to `docs/issues.md` per the grammar in `references/pointer-templates.md`, numbered from the `<!-- next-number: N -->` marker and with the marker bumped in the same write.
+1. File each outstanding item per the declared tracker mode: `gh issue create --label <label> --title <title> --body <body>` in github mode, `glab issue create --yes --label <label> --title <title> --description <body>` in gitlab mode, and in local mode append a new section to `docs/issues.md` per the grammar in `references/pointer-templates.md`, numbered from the `<!-- next-number: N -->` marker and with the marker bumped in the same write.
    The remote command prints the new issue number; capture it for the record doc.
    Pass the `idea` label for a parked backlog item and no label for active work.
 2. Archive each source doc to `docs/archive/`.

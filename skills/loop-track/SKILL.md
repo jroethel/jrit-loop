@@ -56,7 +56,7 @@ trigger.
 Resolve the target repo by name or path (Step 2), read `docs/loop/pointer.md` in that repo for its `tracker:` mode, then file the issue directly:
 
 - `github` - `gh issue create --label <label> --title <title> --body <body>` (omit `--label` entirely when the label is empty).
-- `gitlab` - `glab issue create --label <label> --title <title> --description <body>`.
+- `gitlab` - `glab issue create --yes --label <label> --title <title> --description <body>`.
 - `local` - append a new `## #<n>` section to the file named by the repo's `local-issues-file:` key (default `docs/issues.md`): the heading, then `state: open`, then `labels:` carrying the label (or an empty list), then the body prose - taking `<n>` from the `<!-- next-number: N -->` marker and bumping that marker in the same write.
 
 Relay the tracker's confirmation verbatim: the issue URL that `gh` or `glab` prints, or for `local` the file and the new number.
