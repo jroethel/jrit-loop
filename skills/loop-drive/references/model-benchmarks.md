@@ -29,6 +29,8 @@ Per-unit model choice is one chain, in order (P7: route by evidence, not vibes):
 1. **Integrity-gated scoreboard posterior.** From the ringer repo root recorded by the loop-drive Step 0 probe, run `./ringer.py models --task-type <type>`. Before trusting a posterior, read `<ringer-repo>/docs/MODEL-NOTES.md` and `<ringer-repo>/docs/AMENDMENTS-PENDING.md` for the models under consideration; if the ringer repo is missing, treat the posterior as unverified and fall to the prior tier.
 2. **Else benchmark prior.** A model with no trusted local scoreboard evidence routes by its row in the tier table above.
 3. **Else orchestrator pin.** Design, math- or reasoning-heavy, risk concentration, or taste: pin `engine` and `model` and record the reason. A pin outranks the chain at any tier when its trigger holds; the reason is never "seems hard".
+   Pinned: a unit that redesigns the receipt format every later unit parses - risk concentration, recorded as "downstream units parse this format".
+   Rejected: a unit correcting the same glab flag across four skill files, pinned because "it touches many files" - breadth is not a trigger, so it routes by the chain.
 
 The distilled form: **scoreboard posterior, else benchmark prior, else orchestrator pin.**
 
@@ -40,3 +42,14 @@ If the Step 0 capability probe reported ringer absent on this machine, skip tier
 **Promotion ladder.** Prior semantics follow the ringer ladder: a model is untested until it has scoreboard rows, on probation through its first rows, and proven for a task_type only at 3+ tasks with `first_try_pass_rate >= 0.67` - the row count alone never promotes.
 
 **Roster.** Fable is orchestrator-tier only and never a worker; GLM and codex run only via ringer; sonnet, opus, and haiku are the Agent-tool workers.
+
+## Role pins
+
+A role pin fixes the model for a dispatch role rather than for a unit, so the routing chain never re-routes it.
+This table is the single home of every role pin's model; prose elsewhere cites the pin by role name only.
+
+| Role pin                   | Model | Dispatched by                          |
+| -------------------------- | ----- | -------------------------------------- |
+| drive-compile dispatch     | Opus  | loop-drive, compiling Steps 1-4 and 6  |
+| background-agent-validator | Opus  | loop-drive, one fresh checker per unit |
+| plan-draft                 | Opus  | loop-plan, Steps 3-5                   |

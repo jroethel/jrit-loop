@@ -63,7 +63,7 @@ The block contains, in this order:
 3. The `agent:` label vocabulary in one line.
 4. The sentence that claim, done, status, and next-eligible run through the receipt helper shipped inside the loop-drive skill.
 
-The list command is `gh issue list --state open` in `github` mode, `glab issue list --opened` in `gitlab` mode, and in `local` mode a pointer to the `docs/issues.md` sections whose `state:` is `open`.
+The list command is `gh issue list --state open` in `github` mode, `glab issue list` in `gitlab` mode (open is glab's default; `--opened` is deprecated), and in `local` mode a pointer to the `docs/issues.md` sections whose `state:` is `open`.
 Rendered shape, github mode:
 
 ```markdown
@@ -107,14 +107,18 @@ gh label create wayfinder:map --description "Wayfinder mapping item" || true
 In `gitlab` mode run the same seven labels with the `glab` equivalent:
 
 ```bash
-glab label create idea --description "Parked backlog item, not active work" || true
-glab label create agent:todo --description "Open and unclaimed" || true
-glab label create agent:working --description "Claimed and in progress" || true
-glab label create agent:needs-input --description "Blocked on a human answer" || true
-glab label create agent:review --description "Work done, awaiting review" || true
-glab label create agent:done --description "Closed only through the receipt helper's done verb" || true
-glab label create wayfinder:map --description "Wayfinder mapping item" || true
+glab label create --name idea --description "Parked backlog item, not active work" || true
+glab label create --name agent:todo --description "Open and unclaimed" || true
+glab label create --name agent:working --description "Claimed and in progress" || true
+glab label create --name agent:needs-input --description "Blocked on a human answer" || true
+glab label create --name agent:review --description "Work done, awaiting review" || true
+glab label create --name agent:done --description "Closed only through the receipt helper's done verb" || true
+glab label create --name wayfinder:map --description "Wayfinder mapping item" || true
 ```
+
+The `|| true` also swallows real failures, so confirm the set afterwards instead of trusting the exit codes.
+List the labels with `gh label list --limit 100 --json name --jq '.[].name'` in `github` mode or `glab label list --output json --per-page 100 | jq -r '.[].name'` in `gitlab` mode, and check each of the seven names against that list.
+Any missing label is a setup failure: report the missing names and the create command's error, and never report provisioning as done.
 
 In `local` mode no labels exist to create and this step is skipped.
 Say so in one line: local mode has no tracker labels, so label provisioning is skipped.
@@ -125,11 +129,15 @@ Detect the pre-plugin layout: `config/repo-state.md` exists and `docs/loop/point
 This skill owns the migration; the other loop skills detect the same shape and refuse to proceed silently, pointing here.
 Read the old file's `tracker:`, `rubix-autorun:`, `autonomy-default:`, and Lanes table.
 Render `docs/loop/pointer.md` and `docs/loop/conventions.md` from them using the templates in `references/pointer-templates.md`: `rubix-autorun:` and `autonomy-default:` keep their names and values, and each old lane becomes the tracker read named in the Lanes table, with no mirror.
+An old lane the template has no row for (seen in practice: Roadmap, Chain state, Sessions) is never dropped silently; name each one to the human with what becomes of it.
+Chain state's `docs/chain-state.md` is the runtime state file the mirror step below handles.
+Every other such lane is retired and its home left in place, and a home that holds content, such as a non-empty `ROADMAP.md`, is named as a candidate the import sweep scans rather than skips as a root project file.
 Then handle the generated mirrors, preview-then-assent and never silent:
 
 1. List the files actually found - the three mirror files `ISSUES.md`, `BACKLOG.md`, and `WAYFINDER.md`, plus the one runtime state file `docs/chain-state.md` - with a count, for example "found 2: ISSUES.md, BACKLOG.md".
-2. State plainly that they are untracked and therefore unrecoverable once removed, and that they are deleted rather than frozen because the tracker's own UI is now the view.
-3. Delete them only after explicit assent.
+2. Check each found file with `git ls-files --error-unmatch <file>` and state plainly which are tracked and which are not: a tracked file survives in git history after removal, an untracked one is unrecoverable once removed.
+   Say too that they are deleted rather than frozen because the tracker's own UI is now the view.
+3. Delete them only after explicit assent, tracked files with `git rm` and untracked ones with plain `rm`.
    A decline leaves every file in place and ends the migration with nothing removed.
 
 Finally, leave `config/repo-state.md` and `config/conventions.md` in place for the human to remove.

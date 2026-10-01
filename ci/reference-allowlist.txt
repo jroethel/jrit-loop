@@ -21,3 +21,4 @@ CODING_STANDARDS.md # why: illustrative example of a standards source in the rep
 CONTRIBUTING.md # why: illustrative example of a standards source in the repo under review (loop-review), not a reference that must resolve (added by Task 3's Check B pre-run)
 .claude/CLAUDE.md # why: target-repo instructions file loop-setup writes the @../AGENTS.md import into when the repo root is a plugin root, named in prose, not a skill-shipped file (added by issue #27)
 .claude-plugin/plugin.json # why: target-repo plugin manifest loop-setup checks for to detect a plugin root, named in prose, not a skill-shipped file (added by issue #27)
+whats_next.md # why: illustrative example of a living resume doc in the target repo, named in loop-setup's import-triage prose, not a skill-shipped file

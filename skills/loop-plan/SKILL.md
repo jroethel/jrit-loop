@@ -66,7 +66,7 @@ None may be silently carried into the plan; an unanswered question in a task is 
 **Dispatch.**
 A fresh-context dispatch at the plan-draft role pin bundles decompose + draft + self-review (Steps 3-5); that writer holds only the brief and the codebase, never this conversation.
 The driving session then reviews the dependency graph against the conversation for depends-on edges a fresh writer could not infer.
-The plan-draft role pin resolves to Opus (this line is the pin's single home); cite it by role name everywhere else.
+The plan-draft role pin's model lives in the Role pins table of loop-drive's routing reference (the loop-drive skill's references/model-benchmarks.md), its single home; cite it by role name everywhere else.
 
 **File structure first.**
 Map which files will be created or modified and what each is responsible for; this is where decomposition gets locked in.
