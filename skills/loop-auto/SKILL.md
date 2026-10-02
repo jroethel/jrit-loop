@@ -53,6 +53,31 @@ On `set auto` the session first presents one consolidated ASK - `outstanding bef
 Scope narrowing is ASK-class by definition: a decision that narrows the requested scope is never a BATCH lean or a DEFAULT take, wherever inside a step it arises.
 Narrowing is sometimes right, but it is never silent and never auto-taken - it surfaces as its own explicit question.
 
+### Dispatched sessions
+
+A host that runs a skill on someone else's behalf, relaying its questions from another session, marks that session as dispatched, and every jrit-loop skill honours the mark.
+The mark is a marker file at the path printed by `git rev-parse --path-format=absolute --git-path jrit-loop-dispatched`.
+That path sits inside the worktree's private git directory, so the marker is never committed and belongs to one worktree only.
+The host writes the name of the session's current branch into the marker, and a marker whose content differs from the current branch counts as absent.
+The host writes the marker before it launches or relaunches a dispatched session and removes it before a direct one.
+With the marker absent, every skill behaves exactly as it does without this section.
+
+Each asking skill runs this test itself, once per run, in its own pointer line just before its first ask or wait for a human, so an interactive session never needs to read this section.
+The copy below is the copy of record, and every pointer carries it byte for byte:
+
+```bash
+m="$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched 2>/dev/null)" && test -f "$m" && b="$(git branch --show-current)" && test -n "$b" && test "$(cat "$m")" = "$b"
+```
+
+When the test exits nonzero, the skill asks exactly as it always has and prints nothing about the test.
+When it exits 0, print exactly `question channel: dispatched (marker present)` once, in the same reply as the first round.
+
+When the test passes, at every point a skill would ask or wait for a human, under any gate class or none, it never opens the interactive question tool (AskUserQuestion in Claude Code).
+It prints the round as plain text instead: numbered questions, 2-4 options each, the recommended option first and marked `(recommended)`, and one decision per question.
+Where the host's own instructions prescribe an ask form, the round follows that form.
+Then the skill ends its turn, and the next user turn carries the answers.
+Dispatched changes the channel, never the class: an ASK still blocks until it is answered, and a STOP still halts and states what it needs.
+
 ### Batch-review list format
 
 The batch-review list is the run's gate journal: it is created the moment autonomy takes effect and appended at every gate as it fires, in chronological order, so a run that dies mid-chain still leaves the record of every decision taken so far.

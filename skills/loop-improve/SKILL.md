@@ -71,6 +71,11 @@ Render each match against the findings table contract above: `covered by #N`, `r
 
 Present the findings table, ordered by leverage (impact / effort, discounted by confidence and fix-risk).
 Then the user selects which findings to converge, via AskUserQuestion with multiSelect: the default suggestion is the top 3-5 by leverage plus anything they flag, and a single finding is a fine selection when only one is worth doing.
+
+**Dispatched sessions.** Before the first ask or wait for a human in this skill, run `m="$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched 2>/dev/null)" && test -f "$m" && b="$(git branch --show-current)" && test -n "$b" && test "$(cat "$m")" = "$b"`.
+On any nonzero exit, ask exactly as this skill says and print nothing about the test.
+On exit 0, follow the loop-auto skill's "Dispatched sessions" section for every ask in this run.
+
 All selected findings converge into the ONE brief - selection sets the brief's scope, never its file count.
 Covered findings (Tracker shows `covered by #N`) stay selectable - converging one may be the cleaner path than the open issue.
 

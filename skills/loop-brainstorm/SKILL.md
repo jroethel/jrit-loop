@@ -112,6 +112,10 @@ the user's answers before recomputing.
 A question whose answer depends on another question still open in this round belongs to a later
 round, not this one.
 
+**Dispatched sessions.** Before the first ask or wait for a human in this skill, run `m="$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched 2>/dev/null)" && test -f "$m" && b="$(git branch --show-current)" && test -n "$b" && test "$(cat "$m")" = "$b"`.
+On any nonzero exit, ask exactly as this skill says and print nothing about the test.
+On exit 0, follow the loop-auto skill's "Dispatched sessions" section for every ask in this run.
+
 Present each round through the AskUserQuestion tool, up to 4 questions per call (chunk a larger
 frontier into consecutive calls, dependency-safe order):
 

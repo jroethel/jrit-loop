@@ -16,6 +16,11 @@ It has no setup dependency - runs in any repo, even one with zero loop or issue-
 ### 1. Pin the fixed point
 
 Whatever the user passed is the fixed point (a commit SHA, branch, tag, `main`, `HEAD~5`); if they didn't specify one, ask.
+
+**Dispatched sessions.** Before the first ask or wait for a human in this skill, run `m="$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched 2>/dev/null)" && test -f "$m" && b="$(git branch --show-current)" && test -n "$b" && test "$(cat "$m")" = "$b"`.
+On any nonzero exit, ask exactly as this skill says and print nothing about the test.
+On exit 0, follow the loop-auto skill's "Dispatched sessions" section for every ask in this run.
+
 Capture the diff once (`git diff <fixed-point>...HEAD`, three-dot for merge-base) and the commit list (`git log <fixed-point>..HEAD --oneline`).
 Confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty - a bad ref or empty diff fails here, not inside a subagent.
 

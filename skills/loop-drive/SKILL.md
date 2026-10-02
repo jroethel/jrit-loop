@@ -191,6 +191,10 @@ Every validator prompt (both transports) states verdict discipline explicitly: i
 The output plan's core procedure, per wave, depends on transport for item 1 and shares the gate structure.
 Gate-class semantics (ASK, STOP, BATCH, DEFAULT) and the batch-review journal format live in the loop-auto skill.
 
+**Dispatched sessions.** Before the first ask or wait for a human in this skill, run `m="$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched 2>/dev/null)" && test -f "$m" && b="$(git branch --show-current)" && test -n "$b" && test "$(cat "$m")" = "$b"`.
+On any nonzero exit, ask exactly as this skill says and print nothing about the test.
+On exit 0, follow the loop-auto skill's "Dispatched sessions" section for every ask in this run.
+
 **1. Launch the wave.**
 
 Ringer-transport units: emit one manifest for the wave and run it (`./ringer.py lint <manifest> && ./ringer.py run <manifest>`), using the SAME `run_name` across all waves; ringer's built-in single retry IS the repair pass, you do not add one.

@@ -61,3 +61,8 @@ The `## Expected behavior` section is the last thing in each `prompt.md` body, w
 That is what makes the section portable across runners, and it is the design D11 chose, but it does soften every case: a skill that would not have produced the right behaviour unprompted can still be led to it by the assertion list.
 These cases therefore prove that the skills can reach the named outcomes, not that they reach them unbidden.
 The stricter reading is left to the static tests under `tests/`, which read the skill files directly and cannot be led.
+
+## Verified fact, 2026-10-01
+
+A one-case probe of `plan-interactive-unchanged` ran with `--allow-tools Bash Write Edit AskUserQuestion` before any skill change.
+The runner did not let AskUserQuestion run and never lists it, so the interactive case cannot observe the tool; it grades that the skill still stopped to ask (no plan file written) and printed no channel line, and the dispatched case's zero-call grader is weak by construction.
