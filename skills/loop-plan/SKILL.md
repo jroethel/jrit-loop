@@ -57,6 +57,10 @@ Each question gets answered by your codebase exploration, decided in the plan he
 Ask user questions in frontier rounds, not one per message: batch every question whose prerequisites are settled into one numbered round, wait for the answers, then recompute - a question that depends on another still open this round waits for the next round.
 Facts are your job (explore, don't ask); only decisions go to the user.
 
+**Dispatched sessions.** Before the first ask or wait for a human in this skill, run `m="$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched 2>/dev/null)" && test -f "$m" && b="$(git branch --show-current)" && test -n "$b" && test "$(cat "$m")" = "$b"`.
+On any nonzero exit, ask exactly as this skill says and print nothing about the test.
+On exit 0, follow the loop-auto skill's "Dispatched sessions" section for every ask in this run.
+
 Present each round through AskUserQuestion (up to 4 questions per call), 2-4 concrete options each, your recommendation first.
 One decision per question: a scope narrowing (or any second decision) never rides inside an option's description - it gets its own question, and under autonomy scope narrowing is ASK-class, never auto-taken.
 None may be silently carried into the plan; an unanswered question in a task is a placeholder.

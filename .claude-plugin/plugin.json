@@ -1,6 +1,6 @@
 {
   "name": "jrit-loop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The loop-stack toolkit: brainstorm, plan, drive, review, and track multi-step work through your repo's own issue tracker.",
   "author": { "name": "Jeremy Roethel" },
   "repository": "https://github.com/jroethel/jrit-loop",

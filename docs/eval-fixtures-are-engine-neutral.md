@@ -65,4 +65,4 @@ The stricter reading is left to the static tests under `tests/`, which read the 
 ## Verified fact, 2026-10-01
 
 A one-case probe of `plan-interactive-unchanged` ran with `--allow-tools Bash Write Edit AskUserQuestion` before any skill change.
-The runner did not let AskUserQuestion run, so the interactive case grades the attempt with an `llm` grader on the trace, and the dispatched case's zero-call grader is weak by construction.
+The runner did not let AskUserQuestion run and never lists it, so the interactive case cannot observe the tool; it grades that the skill still stopped to ask (no plan file written) and printed no channel line, and the dispatched case's zero-call grader is weak by construction.
