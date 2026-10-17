@@ -52,4 +52,4 @@ This table is the single home of every role pin's model; prose elsewhere cites t
 | -------------------------- | ----- | -------------------------------------- |
 | drive-compile dispatch     | Opus  | loop-drive, compiling Steps 1-4 and 6  |
 | background-agent-validator | Opus  | loop-drive, one fresh checker per unit |
-| plan-draft                 | Opus  | loop-plan, Steps 3-5                   |
+| plan-draft                 | Opus  | loop-plan, Steps 4-6                   |

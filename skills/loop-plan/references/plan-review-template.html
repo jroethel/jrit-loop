@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Topic] plan review</title>
+<style>
+/* Plan review page, plain renderer. Self-contained: no fetched scripts, no fetched fonts.
+   Every [bracketed] text is a slot filled from the record; delete example rows you do not use. */
+:root{
+  color-scheme:light dark;
+  --bg:#f4f5f7; --panel:#ffffff; --ink:#17202b; --ink-2:#4a5566; --line:#d3d9e2; --line-strong:#8a95a6;
+  --accent:#b35c00; --accent-wash:#fff1e0; --ok:#1f7a4d; --warn:#9a5b00; --bad:#a3262b;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#11151b; --panel:#191e26; --ink:#e8ecf2; --ink-2:#aab4c3; --line:#2b3340; --line-strong:#6e7a8d;
+         --accent:#ffa43a; --accent-wash:#2b1d08; --ok:#5fd3a0; --warn:#f0b24a; --bad:#ff7b80; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--sans)}
+main{max-width:1040px;margin:0 auto;padding:32px 16px 96px}
+h1{font-size:30px;line-height:1.2;margin:0 0 8px}
+h2{font-size:21px;line-height:1.3;margin:0 0 14px;display:flex;gap:12px;align-items:baseline}
+h2 .n{font:600 13px/1 var(--mono);color:var(--accent);letter-spacing:.06em}
+h3{font-size:17px;margin:22px 0 8px}
+p{margin:0 0 12px}
+.meta{color:var(--ink-2);font-size:14px;margin-bottom:28px}
+.meta code{font-family:var(--mono);font-size:13px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px 20px;margin:0 0 20px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0 14px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--ink-2);font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+.tablewrap{overflow-x:auto}
+code{font-family:var(--mono);font-size:.9em}
+.bin{display:inline-block;font:600 11.5px/1 var(--mono);padding:4px 7px;border-radius:4px;border:1px solid currentColor;letter-spacing:.05em;text-transform:uppercase}
+.bin.ok{color:var(--ok)} .bin.warn{color:var(--warn)} .bin.bad{color:var(--bad)}
+/* figure + callout */
+figure{margin:12px 0 18px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
+figure .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:16px;border:1px solid var(--line);border-radius:6px;min-width:0}
+.node{border:1.5px solid var(--line-strong);border-radius:6px;padding:8px 12px;font-size:14px;background:var(--bg);max-width:100%}
+.node.you{border-color:var(--accent);border-style:dashed}
+.node.check{border-radius:999px}
+.arrow{color:var(--line-strong);font-size:18px;line-height:1}
+figcaption{font-size:13.5px;color:var(--ink-2);grid-column:1 / -1}
+.callout{border-left:4px solid var(--accent);background:var(--accent-wash);padding:12px 14px;border-radius:0 6px 6px 0;font-size:14.5px;min-width:0}
+.callout b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.callout dl{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:4px 10px}
+.callout dt{font-weight:600} .callout dd{margin:0}
+@media (max-width:720px){ figure{grid-template-columns:minmax(0,1fr)} }
+/* question cards */
+.q{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:0 0 14px}
+.q header{display:flex;gap:10px;align-items:baseline;margin-bottom:8px}
+.q .id{font:600 13px/1 var(--mono);color:var(--accent)}
+.q label{display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer}
+.q label.rec{font-weight:600}
+.q label span.tag{font-weight:400;color:var(--ink-2);font-size:13px}
+.q input[type=text],textarea{width:100%;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px}
+textarea{min-height:88px;resize:vertical}
+/* verdict + answers */
+.verdict{display:flex;flex-wrap:wrap;gap:12px 24px;margin:8px 0 14px}
+.verdict label{display:flex;gap:8px;align-items:center}
+button{font:600 15px var(--sans);color:#fff;background:var(--accent);border:0;border-radius:6px;padding:10px 16px;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+pre#answers{font:13px/1.5 var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0 0}
+#copied{font-size:14px;color:var(--ok);margin-left:12px}
+ul.fire li{margin-bottom:6px}
+</style>
+</head>
+<body data-round="1">
+<main>
+
+<h1>[Topic]: the shape, before the plan</h1>
+<p class="meta">Source brief <code>[docs/briefs/YYYY-MM-DD.topic-brief.md]</code> · [YYYY-MM-DD] · [N] question rounds held · record <code>[docs/reviews/YYYY-MM-DD.topic-plan-review.md]</code></p>
+
+<section id="s01">
+<h2><span class="n">01</span>Where the changes land</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Place</th><th>What changes</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>[repo or tool]</td><td>[what changes here]</td><td>[why, or what it leans on]</td></tr>
+<tr><td>[repo or tool]</td><td>Nothing.</td><td>[why it stays untouched]</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s02">
+<h2><span class="n">02</span>The flow, and one figure per load-bearing decision</h2>
+<p>[One or two sentences on the end-to-end flow as built.]</p>
+<figure>
+  <div class="flow">
+    <span class="node you">[you: start]</span><span class="arrow">&rarr;</span>
+    <span class="node">[step]</span><span class="arrow">&rarr;</span>
+    <span class="node check">[check]</span><span class="arrow">&rarr;</span>
+    <span class="node">[step]</span><span class="arrow">&rarr;</span>
+    <span class="node you">[you: approve]</span>
+  </div>
+  <aside class="callout"><b>Decision [R1]</b>
+    <dl><dt>Chosen</dt><dd>[what was chosen]</dd>
+        <dt>Lost</dt><dd>[the alternatives]</dd>
+        <dt>Why</dt><dd>[the reason]</dd>
+        <dt>By</dt><dd>[you, round 1 / agent default, reversible]</dd></dl>
+  </aside>
+  <figcaption>Fig 1. [What the figure shows.] Dashed nodes are yours; round nodes are checks that can fail.</figcaption>
+</figure>
+<!-- repeat one <figure> per load-bearing decision -->
+</section>
+
+<section id="s03">
+<h2><span class="n">03</span>Decision log</h2>
+<p>Every decision behind this shape, who made it, and what it beat. <code>D</code> rows predate this run, <code>R</code> rows were yours in a round, <code>M</code> rows are defaults the agent took and each is reversible.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Decision</th><th>Chosen</th><th>Alternatives</th><th>Why</th><th>By</th></tr></thead>
+<tbody>
+<tr><td>D1</td><td>[decision]</td><td>[chosen]</td><td>[lost]</td><td>[why]</td><td>[you, before this run]</td></tr>
+<tr><td>R1</td><td>[decision]</td><td>[chosen]</td><td>[lost]</td><td>[why]</td><td>[you, round 1]</td></tr>
+<tr><td>M1</td><td>[decision]</td><td>[chosen]</td><td>[lost]</td><td>[why]</td><td>agent default, reversible: [how]</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s04">
+<h2><span class="n">04</span>Open decisions</h2>
+<p>Pick an option on each card, or write your own. The recommendation is listed first.</p>
+<form id="qform">
+<div class="q" data-q="Q1">
+  <header><span class="id">Q1</span><strong>[The decision, as a question]</strong></header>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Option</th><th>Gains</th><th>Costs</th></tr></thead>
+  <tbody>
+  <tr><td>[option a]</td><td>[what it gains]</td><td>[what it costs]</td></tr>
+  <tr><td>[option b]</td><td>[what it gains]</td><td>[what it costs]</td></tr>
+  </tbody></table></div>
+  <label class="rec"><input type="radio" name="Q1" value="[option a]" checked>[option a] <span class="tag">(recommended)</span></label>
+  <label><input type="radio" name="Q1" value="[option b]">[option b]</label>
+  <label><input type="radio" name="Q1" value="__other">Other:</label>
+  <input type="text" name="Q1_other" placeholder="your answer" aria-label="Q1 other answer">
+</div>
+<!-- repeat one .q card per open decision -->
+</form>
+</section>
+
+<section id="s05">
+<h2><span class="n">05</span>What the shape assumes</h2>
+<p>Every claim the shape leans on, in three bins.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Bin</th><th>Claim</th><th>Source, or why believed</th><th>What leans on it</th></tr></thead>
+<tbody>
+<tr><td><span class="bin ok">verified</span></td><td>[claim]</td><td>[file:line, command, probe, or your word]</td><td>[decision IDs]</td></tr>
+<tr><td><span class="bin warn">believed</span></td><td>[claim]</td><td>[why; if wrong: what breaks]</td><td>[decision IDs]</td></tr>
+<tr><td><span class="bin bad">guessed</span></td><td>[claim]</td><td>[who picked the number]</td><td>[decision IDs]</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s06">
+<h2><span class="n">06</span>The parking lot, in suggested order</h2>
+<p>Everything deliberately left for later. Each item names what it waits on, so nothing silently drops; the order is a suggestion.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Item</th><th>Waits on</th><th>When it comes back</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>[deferred idea]</td><td>[what must land first]</td><td>[after X / any time, yours to fire]</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s07">
+<h2><span class="n">07</span>Question-round timeline</h2>
+<h3>Round 1</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Question</th><th>Answer</th></tr></thead>
+<tbody>
+<tr><td>[question asked]</td><td>[answer given]</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s08">
+<h2><span class="n">08</span>What happens next</h2>
+<ol>
+<li>[You review this page and send the verdict.]</li>
+<li>[A fresh writer drafts the full plan from the brief and this record.]</li>
+<li>[Rubix review on the plan, per this repo's setting.]</li>
+<li>[You review the run shape and commit the plan.]</li>
+</ol>
+<h3>Yours to fire</h3>
+<ul class="fire">
+<li>[irreversible step, with its exact command]</li>
+</ul>
+</section>
+
+<section id="s09">
+<h2><span class="n">09</span>Verdict</h2>
+<div class="verdict">
+  <label><input type="radio" name="verdict" value="approved" form="qform">Shape approved, write the plan</label>
+  <label><input type="radio" name="verdict" value="changes" form="qform">Changes needed first</label>
+</div>
+<textarea name="notes" form="qform" placeholder="Notes: what to change, or anything the options missed"></textarea>
+<p style="margin-top:12px"><button type="button" id="copy">Copy answers</button><span id="copied" hidden>Copied. Paste the block into the conversation.</span></p>
+<pre id="answers" aria-live="polite"></pre>
+</section>
+
+</main>
+<script>
+(function(){
+  var form=document.getElementById('qform'), out=document.getElementById('answers');
+  var record=document.querySelector('.meta code:last-of-type').textContent.replace(/^\[|\]$/g,'');
+  function build(){
+    var lines=['plan-review: '+record,'round: '+(document.body.dataset.round||'1')];
+    form.querySelectorAll('.q').forEach(function(q){
+      var id=q.dataset.q, v=(form.querySelector('input[name="'+id+'"]:checked')||{}).value||'';
+      if(v==='__other') v=(form.querySelector('input[name="'+id+'_other"]')||{}).value||'';
+      lines.push(id+': '+v);
+    });
+    var verdict=(form.querySelector('input[name="verdict"]:checked')||{}).value||'';
+    lines.push('verdict: '+verdict);
+    lines.push('notes: '+((form.querySelector('textarea[name="notes"]')||{}).value||'').replace(/\n+/g,' '));
+    out.textContent=lines.join('\n');
+    return out.textContent;
+  }
+  form.addEventListener('input',build); build();
+  document.getElementById('copy').addEventListener('click',function(){
+    var text=build(), done=function(){var c=document.getElementById('copied');c.hidden=false;setTimeout(function(){c.hidden=true},2500)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){select();done()})}
+    else{select();done()}
+    function select(){var r=document.createRange();r.selectNodeContents(out);var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand('copy')}catch(e){}}
+  });
+})();
+</script>
+</body>
+</html>
