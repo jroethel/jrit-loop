@@ -45,6 +45,7 @@ The offer is silenced by a `tracker-remote-ack:` line in the pointer doc - a han
 Render the pointer template carried in `references/pointer-templates.md` with the angle-bracket slots filled from this run's answers.
 On a fresh (non-migration) setup the `autonomy-default:` slot is written `pause`, matching the loop-auto skill's default when the key is absent; a migration carries the old repo's value forward.
 Write `local-issues-file:` only when `tracker:` is `local`.
+Write `plan-review:` as `ask` on both a fresh setup and a migration; on a re-run, preserve an existing `plan-review:`, `plan-review-brand:`, or `plan-review-doctype:` line rather than dropping it.
 Omit `tracker-remote-ack:` when rendering: it appears in the file only when the repo pairs a remote codebase with local tracking, and when it appears it was written by hand; on a re-run, preserve an existing `tracker-remote-ack:` line rather than dropping it.
 
 ### docs/loop/conventions.md

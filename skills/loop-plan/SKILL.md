@@ -20,14 +20,14 @@ That executor may be a human, a lone agent, or a wave of parallel workers under 
 The plan stands alone: no skill invocations, no tool-specific instructions, nothing the executor must have installed beyond the repo itself.
 
 ```
-/loop-brainstorm ──> brief ──> /loop-plan ──> plan (+ optional Rubix review via the rubix-review skill) ──> /loop-drive
+/loop-brainstorm ──> brief ──> /loop-plan (+ optional plan review page) ──> plan (+ optional Rubix review via the rubix-review skill) ──> /loop-drive
 ```
 
 Loop work downstream consumes what is set here: explicit depends-on relations become waves, exclusive file ownership makes parallelism safe, and executed acceptance checks are /loop-drive's hard gate (P6: a unit belongs on a worker only if checking is cheaper than producing).
 
 <HARD-GATE>
 Do not write implementation code, scaffold anything, or invoke any implementation skill.
-The only files you create are the plan and its revisions.
+The only files you create are the plan, the plan review page and its record, and their revisions.
 Test code embedded in the plan document is plan content, not implementation.
 </HARD-GATE>
 
@@ -37,12 +37,13 @@ Create a task for each item and complete them in order:
 
 1. **Ingest** - read the brief and everything it points to; explore the codebase
 2. **Resolve open questions** - the brief's planning questions get answered here, not carried
-3. **Decompose** - file map, task boundaries, dependency graph, ownership
-4. **Write the plan file** - `<plans-home>/YYYY-MM-DD.<tokens>.<topic>-plan.md`, where `plans-home:` is read from `docs/loop/pointer.md` (default `docs/plans/`)
-5. **Self-review** - including the loop-drive contract check, fixed inline
-6. **Optional Rubix review** - soft-checked call to the rubix-review skill
-7. **User reviews the plan** - and gets offered the commit
-8. **Hand off** - pinned options, then stop
+3. **Optional plan review** - one page of the shape, approved before any task-level planning is spent
+4. **Decompose** - file map, task boundaries, dependency graph, ownership
+5. **Write the plan file** - `<plans-home>/YYYY-MM-DD.<tokens>.<topic>-plan.md`, where `plans-home:` is read from `docs/loop/pointer.md` (default `docs/plans/`)
+6. **Self-review** - including the loop-drive contract check, fixed inline
+7. **Optional Rubix review** - soft-checked call to the rubix-review skill
+8. **User reviews the plan** - and gets offered the commit
+9. **Hand off** - pinned options, then stop
 
 ## Step 1 - Ingest
 
@@ -65,10 +66,42 @@ Present each round through AskUserQuestion (up to 4 questions per call), 2-4 con
 One decision per question: a scope narrowing (or any second decision) never rides inside an option's description - it gets its own question, and under autonomy scope narrowing is ASK-class, never auto-taken.
 None may be silently carried into the plan; an unanswered question in a task is a placeholder.
 
-## Step 3 - Decompose
+## Step 3 - The plan review (optional)`[gate:ASK]`
+
+A pause between the settled questions and the plan draft: one page shows the shape of the work, and the human approves it before any task-level planning is spent.
+The page is for the reviewer; its record is for the plan writer.
+The section contract for both, the answer block, and the renderer choice live in `references/plan-review.md`; read it in full when this step runs and follow it rather than summarizing it from memory.
+
+Read `plan-review` from `docs/loop/pointer.md` (default `ask` when the key is absent).
+
+- `ask` - after the last question round, offer the review once, as its own message:
+  > "Questions settled. Want the plan review page before the plan draft? One page: where the changes land, the flow with one figure per load-bearing decision, the open decisions, what the shape assumes, the parking lot, and what happens next. You approve the shape, then the plan gets written."
+  Decline means proceed to Step 4; do not offer again.
+- `on` - build the page without asking.
+- `off` - skip silently; proceed to Step 4.
+
+**Build.**
+Write the record first, then the page from it, both at `<reviews-home>/YYYY-MM-DD.<tokens>.<topic>-plan-review.md` and `.html`, where `reviews-home:` is read from `docs/loop/pointer.md` (default `docs/reviews/`) and the token rule is the one in Step 5.
+Every decision taken so far, by the human in a round or by you as a default, gets an ID in the record's decision log; a default is marked reversible.
+Every load-bearing claim is binned verified, believed, or guessed, with its source.
+
+**Render.**
+**Probe.** Check whether a skill named `lavish` is available in this session.
+**Present:** render the page through lavish, hand it the brand pack and doctype when either was named, and collect the answers through lavish's own feedback channel.
+**Absent:** write the page from `references/plan-review-template.html`, tell the human the path to open in a browser, and collect the answers from the page's copy-answers block pasted into the conversation.
+**Disclose:** say in one line "the optional lavish renderer is not installed in this session; the plan review page is plain HTML at <path>."
+The brand pack and doctype come from `brand=<slug>` and `doctype=<slug>` named when loop-plan is invoked, else from the optional pointer keys `plan-review-brand:` and `plan-review-doctype:`, else none; the plain page has neither and says so in one line when either was named.
+
+**Review.**
+Stop and wait for the verdict; this is an ASK gate, so autonomy never takes it, and under `auto` it is the last ASK before autonomy takes effect.
+"Changes needed" means fold the notes into the record, rebuild the page, and ask again; a second round catches what only shows in the full picture.
+"Approved" means append the answers and the verdict to the record and proceed to Step 4.
+In a dispatched session, write both files, print the page path and the open decisions as the plain-text round, and end the turn.
+
+## Step 4 - Decompose
 
 **Dispatch.**
-A fresh-context dispatch at the plan-draft role pin bundles decompose + draft + self-review (Steps 3-5); that writer holds only the brief and the codebase, never this conversation.
+A fresh-context dispatch at the plan-draft role pin bundles decompose + draft + self-review (Steps 4-6); that writer holds only the brief, the codebase, and the plan review record when one exists, never this conversation.
 The driving session then reviews the dependency graph against the conversation for depends-on edges a fresh writer could not infer.
 The plan-draft role pin's model lives in the Role pins table of loop-drive's routing reference (the loop-drive skill's references/model-benchmarks.md), its single home; cite it by role name everywhere else.
 
@@ -91,7 +124,7 @@ For a wide refactor, expand-contract is the reference pattern: land the new stru
 - Every task's file list is exclusive ownership. Two tasks touching one file must be dependent, never parallel; a shared file is a boundary error, redraw it.
 - Every task ends in an acceptance check: one command, its expected pass condition, tagged `[executed-check]`. A task whose acceptance is `[judgment]` is not a task; its criterion routes to a human checkpoint.
 
-## Step 4 - Write the plan file
+## Step 5 - Write the plan file
 
 Save to `<plans-home>/YYYY-MM-DD.<tokens>.<topic>-plan.md`, where `<plans-home>` is the `plans-home:` key from `docs/loop/pointer.md`, defaulting to `docs/plans/` when the key is absent.
 Follow the user's global markdown style instructions already loaded in this session's context, when any exist.
@@ -110,6 +143,7 @@ When the work belongs to a logged tracker item, include its token segment(s) (e.
 **Approach:** 2-3 sentences, from the brief's chosen approach and rationale.
 **Tech stack:** key technologies.
 **Source brief:** path, if one exists.
+**Plan review:** path of the plan review record, if one exists; the plan's decisions cite its IDs.
 
 ## Global constraints
 The project-wide requirements, one line each, exact values verbatim.
@@ -171,7 +205,7 @@ These are plan failures, never written:
 - References to types or functions no task defines
 - A skill, plugin, or harness-specific instruction the executor may not have
 
-## Step 5 - Self-review
+## Step 6 - Self-review
 
 Look at the written plan with fresh eyes and fix inline:
 
@@ -182,7 +216,7 @@ Look at the written plan with fresh eyes and fix inline:
 5. **Agnosticism scan** - the plan survives an executor who has never heard of this toolchain; no skill names, no harness features.
 6. **Run shape** - every task appears exactly once, each wave matches the task's Depends-on edges, and every human row says why.
 
-## Step 6 - The Rubix review (optional)`[gate:DEFAULT]`
+## Step 7 - The Rubix review (optional)`[gate:DEFAULT]`
 
 Named for a Rubik's cube: the same object re-oriented shows faces the builder stopped seeing.
 The review now lives in its own skill; this step decides whether to call it, then folds in what it returns.
@@ -198,26 +232,26 @@ Read `rubix-autorun` from `docs/loop/pointer.md` (default `ask` when the key is 
 
 - `ask` - offer the review once, as its own message, after self-review passes:
   > "Plan written. Want the Rubix review? The rubix-review skill sends fresh-context reviewers - one reads it as a professional downstream of the artifact, one gives it a cold best-practice read. Findings with rationale, you pick what gets in."
-  Decline means proceed to Step 7; do not offer again.
+  Decline means proceed to Step 8; do not offer again.
 - `on` - invoke rubix-review on the plan file without asking.
-- `off` - skip silently; proceed to Step 7.
+- `off` - skip silently; proceed to Step 8.
 
 On acceptance (or auto), invoke the rubix-review skill on the plan file, then triage its findings as below.
 
 **If the rubix-review skill is not available:** the optional Rubix review skill is not installed in this session; continuing without it.
-Warn once per context, never per plan, and fall back to Step 7 directly - never a hard failure.
+Warn once per context, never per plan, and fall back to Step 8 directly - never a hard failure.
 This is the soft, optional review being skipped, unlike the reviewer-conduct contract, which is a required co-install that fails closed.
 
-**Triage.** Record your own verdict - revise or no - with a one-line reason for every finding; none applied silently or dismissed without a written reason. Present one table: finding, lens, severity, reviewer rationale (condensed), your verdict. The user picks which get incorporated; revise; re-run Step 5.`[gate:BATCH]`
+**Triage.** Record your own verdict - revise or no - with a one-line reason for every finding; none applied silently or dismissed without a written reason. Present one table: finding, lens, severity, reviewer rationale (condensed), your verdict. The user picks which get incorporated; revise; re-run Step 6.`[gate:BATCH]`
 
-## Step 7 - User review gate`[gate:DEFAULT]`
+## Step 8 - User review gate`[gate:DEFAULT]`
 
 Print the plan's Run shape table first, so the auto/human split is reviewed while the plan is fresh; the user may flip any task's shape, and each flip is written into the Run shape section with its reason so it is not re-litigated downstream.
 Under autonomy the derived shapes stand and are journaled.
 Tell the user where the plan was written, invite review and revisions, and offer the commit (phrasing yours); wait for the response.
 Changes requested means edit and re-run the self-review. Never commit without the offer being accepted.
 
-## Step 8 - Hand off (pinned)`[gate:DEFAULT]`
+## Step 9 - Hand off (pinned)`[gate:DEFAULT]`
 
 Close by naming the approved plan's path and the routes onward: **/loop-drive** - its front-door triage answers the run-shape verdict ("is this worth automating / how should I run this plan", the One-Minute Test for a plan in hand) and then drives it - execution by hand or with any agent, or stopping here - the plan stands alone either way.
 

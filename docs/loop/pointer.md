@@ -7,6 +7,7 @@ pointer-version: 1
 tracker: github
 autonomy-default: pause
 rubix-autorun: ask
+plan-review: ask
 handoffs-home: docs/handoffs/
 briefs-home: docs/briefs/
 plans-home: docs/plans/

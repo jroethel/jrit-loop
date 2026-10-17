@@ -15,6 +15,7 @@ pointer-version: 1
 tracker: <github|gitlab|local>
 autonomy-default: <pause|auto>
 rubix-autorun: <ask|off|on>
+plan-review: <ask|off|on>
 handoffs-home: docs/handoffs/
 briefs-home: docs/briefs/
 plans-home: docs/plans/
@@ -49,6 +50,8 @@ Rendering rules for the conditional keys:
 `local-issues-file:` is written only when `tracker:` is `local`.
 `tracker-remote-ack:` is written only when `tracker:` is `local` and the repo has a github or gitlab remote; it is a hand-written line, never something loop-setup writes itself.
 `rubix-autorun:` is the successor of the old `config/repo-state.md` key of the same name, same values (`ask` default, `off`, `on`).
+`plan-review:` gates loop-plan's optional plan review page, same values (`ask` default, `off`, `on`); a migration writes `ask`, since the old layout had no such key.
+Two optional keys, `plan-review-brand: <slug>` and `plan-review-doctype: <slug>`, name the brand pack and doctype loop-plan hands to the page renderer; they are hand-written lines, never rendered by loop-setup, and absent means none.
 
 ## What docs/loop/conventions.md must contain
 

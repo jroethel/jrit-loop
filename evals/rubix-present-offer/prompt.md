@@ -4,9 +4,15 @@ timeout_seconds: 1200
 allowed_tools: [Bash, Read, Write, Edit, Glob, Grep, Skill]
 ---
 
-This case runs in a session where the `rubix-review` skill IS available, so `/loop-plan` Step 6 takes its present branch.
+This case runs in a session where the `rubix-review` skill IS available, so `/loop-plan` Step 7 takes its present branch.
 
 Make a directory named `repo` inside your current working directory, turn it into a new git repository, and work only inside it.
+
+Then run this command, exactly as written, so the repository turns the optional plan review page off and the only offer in this run is the Rubix one.
+
+```bash
+mkdir -p repo/docs/loop && printf 'pointer-version: 1\ntracker: github\nplan-review: off\n' > repo/docs/loop/pointer.md
+```
 
 Here is the brief to plan from.
 

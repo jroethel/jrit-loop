@@ -5,7 +5,7 @@ A raw idea goes in one end, and brainstorming, planning, execution, review, and 
 
 ## Install
 
-<!-- jrit-loop-version: 0.3.0 -->
+<!-- jrit-loop-version: 0.4.0 -->
 
 From a Claude Code marketplace:
 
@@ -25,7 +25,7 @@ npx skills@1.5.26 add jroethel/jrit-loop
 | Skill           | What it does                                                                                              |
 | --------------- | --------------------------------------------------------------------------------------------------------- |
 | loop-brainstorm | Shape a raw idea or feature request into a vetted brief before any plan exists.                           |
-| loop-plan       | Turn an approved brief or spec into an executor-agnostic implementation plan broken into tasks.           |
+| loop-plan       | Turn an approved brief or spec into an executor-agnostic implementation plan, with an optional plan review page first. |
 | loop-drive      | Orchestrate a plan's execution step by step, routing each task to a capable worker session.               |
 | loop-review     | Run a two-axis review, spec and standards, of the work since a fixed point you name.                      |
 | loop-improve    | Audit the repo and its tracker lanes, then converge the worthwhile findings into one brief.               |

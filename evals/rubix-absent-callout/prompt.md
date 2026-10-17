@@ -6,6 +6,12 @@ allowed_tools: [Bash, Read, Write, Edit, Glob, Grep, Skill]
 
 Make a directory named `repo` inside your current working directory, turn it into a new git repository, and work only inside it.
 
+Then run this command, exactly as written, so the repository turns the optional plan review page off and the only offer in this run is the Rubix one.
+
+```bash
+mkdir -p repo/docs/loop && printf 'pointer-version: 1\ntracker: github\nplan-review: off\n' > repo/docs/loop/pointer.md
+```
+
 Here is the brief to plan from.
 
 > **Brief: repository glossary.** The repository needs a short glossary at `docs/glossary.md` covering the three words a newcomer trips over here: brief, plan, unit.
