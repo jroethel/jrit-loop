@@ -6,8 +6,8 @@ description: Declare a repo's tracker mode once, write the two pointer docs docs
 # loop-setup
 
 Bootstraps the loop convention in the current repo by writing the files itself.
-There is no setup script to invoke: this skill creates no executable files and no mirror files, and every artifact it writes is markdown.
-It does exactly six things and nothing else:
+There is no setup script to invoke: this skill creates no executable files and no mirror files, and every artifact it writes itself is markdown; the optional seventh action runs jrit-core's own script, which writes the chain kit with no execute bit.
+It does exactly six things, plus one optional seventh, and nothing else:
 
 1. Asks the tracker mode once.
 2. Writes `docs/loop/pointer.md`.
@@ -15,6 +15,7 @@ It does exactly six things and nothing else:
 4. Writes or updates the managed section in `AGENTS.md`.
 5. Writes or appends the one-line `@AGENTS.md` import to `CLAUDE.md`.
 6. In `github` or `gitlab` mode, ensures the label set exists.
+7. Optionally, when jrit-core and its pinned cezar engine are on this machine, stamps the cezar chain kit into this repo.
 
 ## Tracker modes
 
@@ -145,13 +146,20 @@ Announce this as the one thing migration does not do for them.
 
 After the pointer docs are rendered, the run continues with the remaining actions as normal: the `AGENTS.md` managed section, the `CLAUDE.md` import line, and, in `github` or `gitlab` mode, the label set.
 
+### The optional chain kit
+
+jrit-core is found at `${JRIT_CORE_ROOT:-$HOME/repos/jrit/jrit-core}`; set `JRIT_CORE_ROOT` where jrit-core lives elsewhere, as on the Mac.
+Run `s="${JRIT_CORE_ROOT:-$HOME/repos/jrit/jrit-core}/scripts/stamp-chain-kit.sh"; [ -f "$s" ] && bash "$s" --check`.
+On exit 0, run `bash "$s" "$(git rev-parse --show-toplevel)"` and repeat its two output lines to the user.
+On any other exit, print exactly `chain kit not stamped: jrit-core or cezar not found on this machine.` and continue; no other action depends on this one.
+
 ## The import sweep
 
-After the six actions, offer the import sweep: scan for pre-existing work files and file the outstanding items as tracker issues.
+After the actions above, offer the import sweep: scan for pre-existing work files and file the outstanding items as tracker issues.
 The recommended default is the triage workflow in `references/import-triage.md`.
 The sweep runs in all three modes, loop-setup is attended-only and ignores the loop-auto autonomy knob, and there is no unattended triage mode.
 
 ## Re-running
 
 Re-running is safe: the mode question is never re-asked, an existing `tracker-remote-ack:` line is preserved, the managed section rewrites only between its markers, and the label commands treat an existing label as success.
-The skill never writes mirror files, never creates an executable, and never touches a file outside the six actions and the migration named above.
+The skill never writes mirror files, never creates an executable, and never touches a file outside the seven actions and the migration named above.
