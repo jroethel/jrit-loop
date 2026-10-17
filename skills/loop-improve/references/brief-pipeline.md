@@ -42,6 +42,8 @@ Scale each to the idea - one sentence is fine for a simple one - and use your ju
 | Known vs guessed           | Three bins: verified / believed-unchecked / guessed, with what breaks if a  |
 |                            | guess is wrong                                                              |
 | Parking lot                | Every parked thread, verbatim enough to restart later                       |
+| North star and invariants  | The maximal end state in 2-3 sentences, then each decision v1 must get      |
+|                            | right and the parked future that depends on it                              |
 | Out of scope               | What this deliberately is not                                               |
 | Open questions for planning| Implementation questions that surfaced, one line each, unanswered           |
 
@@ -51,9 +53,10 @@ For a `[judgment]` criterion, attempt one reformulation toward checkable - "feel
 Downstream, /loop-plan routes every `[judgment]` tag to a human checkpoint (never a worker task), and the One-Minute Test front-door checkability question and /loop-drive's step 1 halt condition consume the tags directly (P6: work enters a swarm only when checking is cheaper than producing).
 
 **What the brief is not.**
-Outside the Approach and Known vs guessed sections, the brief contains no components, no data flow, no schedulers, no file formats, no library names, no phased build roadmap.
+Outside the Approach, Known vs guessed, and North star and invariants sections, the brief contains no components, no data flow, no schedulers, no file formats, no library names, no phased build roadmap.
 If any of those appears elsewhere in your draft, move it to Open questions for planning as a single line and delete the prose.
 Approach and Known vs guessed may name plugins, platforms, and mechanisms when decision-bearing - that is which-shape-and-why, the grain those sections exist to record.
+North star and invariants may name the format or interface an invariant protects, stated as what must hold, never how it is built.
 What stays banned even there: speccing the innards of the chosen shape.
 The test for every other section: every sentence should survive the implementation being swapped out entirely.
 
@@ -63,9 +66,10 @@ Look at the written brief with fresh eyes and fix inline:
 
 1. **Placeholder scan** - any TBD, vague requirement, or empty REQUIRED section.
 2. **Internal consistency** - do sections contradict each other?
-3. **Architecture scan** - run the "survives an implementation swap" test on every sentence outside Approach and Known vs guessed; inside them, check the grain instead (which-shape-and-why stays, innards-spec moves to Open questions for planning).
+3. **Architecture scan** - run the "survives an implementation swap" test on every sentence outside Approach, Known vs guessed, and North star and invariants; inside them, check the grain instead (which-shape-and-why stays, innards-spec moves to Open questions for planning).
 4. **Ambiguity check** - could any criterion be read two ways? Pick one, make it explicit.
 5. **Tag audit** - is every success criterion tagged, and every `[judgment]` tag the survivor of an attempted reformulation?
+6. **Invariant trace** - does every invariant trace to a named parked future? Cut any that do not.
 
 ## User review gate and commit offer
 

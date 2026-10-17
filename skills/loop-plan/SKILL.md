@@ -113,6 +113,7 @@ Prefer small files with one clear responsibility; in existing codebases, follow 
 A task is the smallest unit that carries its own test cycle and is worth a fresh reviewer's gate.
 Fold setup, config, and docs into the task whose deliverable needs them; split only where a reviewer could reject one task while approving its neighbor.
 The brief's seams are candidate task boundaries; deviations from them get a recorded reason.
+The brief's invariants (its North star and invariants section) are non-negotiable constraints on seam 1: each becomes a Global constraints line verbatim, and a plan that cannot honor one stops and asks rather than trading it away.
 
 **Prefactor rule.**
 Restructuring that must precede a change is called out as its own earlier task or step, so it never rides inside a feature task.

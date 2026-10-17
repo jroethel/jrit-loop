@@ -50,6 +50,11 @@ options the user expects you to surface (see the asset sweep below).
 The brief can be short - a few sentences per section for truly simple ideas - but you must write
 it and get approval.
 
+## Anti-pattern: converging while generating
+
+Convergence pressure is banned during the possibility sweep (Step 2.5).
+Trimming, ranking, or ruling a future out of scope while the sweep runs cuts the possibility space before anyone has seen it; scope is cut afterwards, by parking, never during.
+
 ## Checklist
 
 Create a task for each item and complete them in order:
@@ -57,6 +62,7 @@ Create a task for each item and complete them in order:
 0. **Front-door triage (One-Minute Test)** - route the idea before spending; exit on CHAT / DON'T BOTHER
 1. **Explore context** - files, docs, recent commits; never ask what context already answers
 2. **Run the three scope probes, then the domain-modeling probe (E)** - before any detailed questions
+   - **2.5 Possibility sweep** - future-back, cross-product, consumer-backward, scale; output capped to parked items and invariants
 3. **Ask clarifying questions** - in AskUserQuestion frontier rounds
 4. **Propose 2-3 approaches** - trade-offs and your recommendation
 5. **Present the brief section by section** - approval per chunk
@@ -99,6 +105,24 @@ Run these before clarifying questions, most expensive mistake first. Each catche
   An installed tool that already supplies a capability is a first-class asset, and it gets swept before any subagent explores approaches.
 - **Glossary challenge (domain modeling, E)** - define every domain term the idea turns on in one plain sentence a non-expert could repeat back. A term that needs hand-waving or a circular reference is fuzzy: sharpen it, or flag it under Known vs guessed as believed-unchecked, never a silent assumption.
 - **Scenario stress-test (optional)** - only when a domain term is load-bearing (a success criterion or seam depends on what it means): walk two or three edge scenarios that stretch the definitions; where the glossary bends becomes an Open question for planning.
+
+## Step 2.5 - Possibility sweep
+
+Step 2's probes all narrow; this step widens, once, before any clarifying round applies convergence pressure.
+Run four moves, scaled to the idea - a sentence each is fine for a small one:
+
+1. **Future-back pass** - write the maximal end state first: if this succeeded beyond reason in 2-3 years, what exists and who uses it? Then derive v1 as the smallest slice on the path to that end state.
+2. **Cross-product enumeration** - name the domain's 2-3 core nouns, enumerate their cross product, and inspect the cells nobody named, including entities in unnatural seats (a consumer acting as a producer, an output used as an input).
+3. **Consumer-backward walk** - for every asset in the Step 2 sweep, ask "what would this consumer want from the idea?", not "where could the idea plug in?"
+4. **Scale probes** - what changes at 10x usage, team-wide, and cross-project?
+
+The sweep's output is capped to two artifacts, and it never widens Done looks like:
+
+- **Parked items** - every future the sweep finds goes to the Parking lot with its restart context, confirmed in one line ("parked: X") as the cascade rule says.
+- **Durable invariants** - the decisions v1 must get right because a parked future depends on them (a format, an interface, a naming or ownership choice that is expensive to reverse), each naming the parked item it protects.
+
+Both land in the brief: the maximal end state and the invariants in North star and invariants, the futures in Parking lot.
+The sweep asks the user nothing; the user approves its output with that brief section in Step 5.
 
 ## Step 3 - Clarifying questions in rounds`[gate:ASK]`
 
