@@ -1,0 +1,50 @@
+## 2. Routing table
+
+| Unit | Wave | task_type | Model | Transport | Engine | Impl. effort | Val. effort | Evidence |
+|---|---|---|---|---|---|---|---|---|
+| U1 Glossary | 1 | docs-write | haiku | background-agent | harness (Agent tool) | medium | medium | prior |
+| U2 Changelog seed | 2 | docs-write | haiku | background-agent | harness (Agent tool) | medium | medium | prior |
+| U3 Diagnostic form | 3 | docs-write | haiku | background agent (Claude Code `Agent`, background) | harness (Agent tool) | medium | medium | prior |
+
+Footnotes:
+
+- Routing tier used: benchmark prior, from loop-drive's references/model-benchmarks.md.
+- The scoreboard posterior tier is skipped this run because ringer is absent; no ringer-produced evidence is cited.
+- Prior row applied: haiku-4.5, Fast, "Thin, mechanical, well-referenced units", loop-which tier examples, 2026-07-19.
+- Both units are thin, mechanical, and fully specified by an inline acceptance check, which matches that row.
+- The fallback worker if a unit fails twice on haiku is sonnet (sonnet-5, Strong, default execution worker), applied only by a human-approved re-route.
+- Roster is the Agent-tool roster only: sonnet, opus, haiku.
+- Fable is never a worker.
+- GLM/claude-zai and codex run only via ringer, so they are unavailable here, and the claude-zai tie-break does not apply.
+- Validators for both units run at the background-agent-validator role pin (per the Role pins table), at medium effort.
+- No unit is routed to ringer; every unit takes the background-agent transport.
+- Effort is capped at high; nothing here requests more than medium.
+
+## 5. Pre-flight checklist
+
+1. Commit the gate journal via the pre-flight journal-commit step before anything else, so worktrees branch from committed state.
+2. Repo state: confirm repo/ is a git repository; if it is not, run `git init` on repo/ and make an initial commit.
+   Run the dirty-tree check (`git -C <repo> status --porcelain` must print nothing); if it is dirty, STOP and ask the human.
+3. Record the pre-run base: `git -C <repo> rev-parse HEAD`, saved in the gate journal as `<pre-run-base>`.
+4. Create the integration branch: `git -C <repo> branch loop/drive-integration <pre-run-base>`.
+5. Create the log directory `docs/loop/logs/` and the handoffs directory `docs/handoffs/` on the integration branch if they do not exist (handoffs-home defaults to docs/handoffs/ because docs/loop/pointer.md does not exist).
+6. Probe results, with disclose lines quoted verbatim:
+
+   Ringer probe: `[ -f "${RINGER_ROOT:-$HOME/repos/ringer}/ringer.py" ]` with RINGER_ROOT=/nonexistent/ringer-is-not-installed-here gave ABSENT.
+   Degraded mode.
+
+ringer not found at the probed path; running degraded: background-agent transport only, routing by prior.
+
+herdr not detected; dispatching workers through the harness's own background-agent transport.
+
+   CEZ_TASK_ID is unset, so the cezar transport is not in play and no cezar disclose line applies.
+
+7. Compile-time note: the shell sandbox failed to initialize during compile.
+   The probe commands, the `git init` of repo/, and the dirty-tree check could not be executed at compile time.
+   Probe results above are by path inspection; the RINGER_ROOT path is a declared nonexistent path.
+   All of these must be re-run at launch, as a dry run, before wave 1.
+
+Ringer is absent, so the routing skips the scoreboard tier entirely.
+- Ringer: ABSENT. Probe: `[ -f "${RINGER_ROOT:-$HOME/repos/ringer}/ringer.py" ]`.
+Skip `ringer.py lint` because ringer is absent.
+| Evidence key | prior = benchmark prior table; no ringer posterior |

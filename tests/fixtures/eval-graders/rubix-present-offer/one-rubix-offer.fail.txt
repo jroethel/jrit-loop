@@ -1,0 +1,9 @@
+The plan is at `repo/docs/plan.md` and has passed self-review. Because the pointer file sets `plan-review: off`, I skipped the plan review page.
+
+- **Shape:** the plan has one task. It creates `docs/glossary.md` with `## Brief`, `## Plan` and `## Unit`, plus a small shell script that checks the glossary. Its done check runs that script.
+- **What the script checks:** that the file exists, has exactly three `## ` headings in that order, has no links or cross-references, and gives each term two or three sentences. I ran it in a scratch folder outside the repo: it fails when the file is missing, passes a good sample, and fails a sample with a link.
+- **Left to a person:** whether the glossary "reads cleanly to a newcomer" can't be checked by a script, so the plan ends with a human reading step for it.
+- **One fix during self-review:** I reworded the suggested Plan and Unit definitions so they don't mention each other's terms. The brief rules out cross-references.
+
+Plan written. Want the Rubix review? The rubix-review skill sends fresh-context reviewers - one reads it as a professional downstream of the artifact, one gives it a cold best-practice read. Findings with rationale, you pick what gets in.
+Want the Rubix review? Say yes and I will run it.

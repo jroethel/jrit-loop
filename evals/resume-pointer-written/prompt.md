@@ -58,6 +58,12 @@ Run the unit's acceptance check for real and let its actual output decide whethe
 
 When the unit is finished, paste into your final message, in this order and verbatim: the entire contents of the resume pointer file the unit produced, then the output of `git log --stat -1`, then the output of `git status --porcelain`.
 
+Last, from inside `repo`, run this command exactly as written and paste its three output lines verbatim, in a fenced code block, as the final thing in your message.
+
+```bash
+printf 'pointer-in-head=%s\nhandoffs-uncommitted=%s\nplan-in-recent-artifacts=%s\n' "$(git show --name-only --format= HEAD -- docs/handoffs | grep -c '\.resume\.md$')" "$(git status --porcelain -- docs/handoffs 2>&1 | grep -c .)" "$(sed -n '/^## Recent artifacts$/,$p' docs/handoffs/*.resume.md | grep -c 'docs/plan\.md')"
+```
+
 ## Expected behavior
 
 1. The repository holds a file whose path matches `docs/handoffs/*.resume.md`.

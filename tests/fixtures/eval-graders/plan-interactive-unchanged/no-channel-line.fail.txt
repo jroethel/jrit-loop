@@ -1,0 +1,4 @@
+question channel: dispatched (marker present)
+Round 1: which greeting style?
+1. Plain text greeting (recommended)
+2. Banner greeting

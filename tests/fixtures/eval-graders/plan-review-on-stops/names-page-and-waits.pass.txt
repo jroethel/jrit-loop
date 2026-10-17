@@ -1,0 +1,1 @@
+The plan is written. Open docs/reviews/2026-10-17.greeting-plan-review.html and tell me when you are done reviewing; I will wait.

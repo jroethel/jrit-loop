@@ -230,7 +230,7 @@ Read `rubix-autorun` from `docs/loop/pointer.md` (default `ask` when the key is 
 
 **If the rubix-review skill is available:**
 
-- `ask` - offer the review once, as its own message, after self-review passes:
+- `ask` - offer the review once, as its own message, after self-review passes, in exactly these words:
   > "Plan written. Want the Rubix review? The rubix-review skill sends fresh-context reviewers - one reads it as a professional downstream of the artifact, one gives it a cold best-practice read. Findings with rationale, you pick what gets in."
   Decline means proceed to Step 8; do not offer again.
 - `on` - invoke rubix-review on the plan file without asking.

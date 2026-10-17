@@ -1,0 +1,2 @@
+I found config/repo-state.md and no docs/loop/pointer.md.
+I will not continue on this layout.

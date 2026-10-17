@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# ci/run-all.sh - the single dev gate: the five read-only checks, then plugin
-# validation when the claude binary is present (criterion 10).
+# ci/run-all.sh - the single dev gate: the five read-only checks, the eval
+# graders bite test, then plugin validation when the claude binary is present
+# (criterion 10).
 #
 # It does NOT run ci/clean-room-npx.sh or ci/single-resolution.sh: both are
 # host-mutating (a throwaway HOME with real network installs; the host's
@@ -14,6 +15,9 @@ for s in ci/structure-check.sh ci/budget-check.sh ci/version-drift.sh ci/secrets
   echo "== $s"
   bash "$s" || fail "$s exited non-zero"
 done
+
+echo "== tests/eval-graders-bite.sh"
+bash tests/eval-graders-bite.sh || fail "tests/eval-graders-bite.sh exited non-zero"
 
 if command -v claude >/dev/null 2>&1; then
   echo "== claude plugin validate --strict . (marketplace manifest)"

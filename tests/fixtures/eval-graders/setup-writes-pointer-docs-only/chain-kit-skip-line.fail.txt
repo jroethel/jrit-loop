@@ -1,0 +1,2 @@
+Wrote docs/loop/pointer.md.
+chain kit not stamped.

@@ -1,0 +1,59 @@
+Unit 1 is finished and committed. I wrote `docs/glossary.md` with three terms (brief, plan and unit), each under its own `## ` heading with three sentences. I ran the acceptance check `grep -c '^## ' docs/glossary.md` and it printed `3`, so the unit passed.
+
+The closing commit adds the glossary and the resume pointer, and closes local issue 1 in `docs/issues.md` with the label `agent:done`. Because I did the work directly in this session, I skipped some of loop-drive's machinery:
+- **Issue history:** the `agent:working` label was only ever in the working tree, so the history shows the issue going straight from `agent:todo` to `agent:done`.
+- **Not done:** I didn't post any `AGENT STATUS` receipts, didn't run a separate validator, and didn't run the optional `/loop-review` at the end.
+
+Resume pointer (`docs/handoffs/2026-10-17.unit-1-glossary.resume.md`):
+
+```markdown
+# Resume pointer: Unit 1 - Glossary
+
+## Unit
+Unit 1 - Glossary, from `docs/plan.md` (Unit 1), tracked as local issue 1 in `docs/issues.md`.
+
+## State
+`docs/glossary.md` exists on branch `main` with the three terms brief, plan, and unit, and the acceptance check `grep -c '^## ' docs/glossary.md` printed `3` (passed); issue 1 is closed with label `agent:done`.
+
+## Next step
+No further units remain in `docs/plan.md`; run `/loop-review <commit before this unit>` for an advisory review, or start the next plan.
+
+## Recent artifacts
+- docs/plan.md
+- docs/issues.md
+- docs/glossary.md
+- docs/handoffs/2026-10-17.unit-1-glossary.resume.md
+```
+
+`git log --stat -1`:
+
+```
+commit a056c09e5237d25df211c4289c80bf5eea338aa8
+Author: Plugin Eval <eval@example.invalid>
+Date:   Sat Oct 17 13:29:21 2026 -0400
+
+    Unit 1: add glossary of brief, plan, and unit
+    
+    Acceptance check: grep -c '^## ' docs/glossary.md printed 3.
+    Closes local issue 1 and adds the unit's resume pointer.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ docs/glossary.md                                   | 18 ++++++++++++++++++
+ docs/handoffs/2026-10-17.unit-1-glossary.resume.md | 16 ++++++++++++++++
+ docs/issues.md                                     |  4 ++--
+ 3 files changed, 36 insertions(+), 2 deletions(-)
+```
+
+`git status --porcelain` printed nothing, so the working tree is clean:
+
+```
+```
+
+Final check:
+
+```
+pointer-in-head=1
+handoffs-uncommitted=0
+plan-in-recent-artifacts=1
+```

@@ -1,0 +1,91 @@
+# Repository Glossary Implementation Plan
+
+> For executors: tasks use checkbox syntax; execute in dependency order; a task is done when its
+> acceptance check passes. No specific tooling, harness, or skills are assumed.
+
+**Goal:** Add `docs/glossary.md`, a three-entry glossary defining "brief", "plan", and "unit" for newcomers.
+**Approach:** A single Markdown file with one `## ` heading per term, each followed by two or three plain sentences.
+The entries stand alone: no links and no references to other entries or other files.
+**Tech stack:** Markdown; POSIX shell for the acceptance check.
+**Source brief:** inline brief "repository glossary" (no brief file in the repo).
+**Plan review:** none (`plan-review: off` in `docs/loop/pointer.md`).
+
+## Global constraints
+
+- File path is exactly `docs/glossary.md`.
+- Exactly three `## ` headings, in this order: `## Brief`, `## Plan`, `## Unit`.
+- Each entry is two or three sentences long.
+- No links of any kind (no `[text](url)`, no bare URLs, no `<...>` autolinks).
+- No cross-references: an entry never mentions another entry's term as a pointer ("see Plan") and never points to another file or section.
+- Written for a reader who has never seen this repository; no jargon left undefined inside its own entry.
+
+## Dependency graph
+
+```
+Task 1 (glossary file)
+```
+
+One task; nothing runs in parallel and nothing gates it.
+
+## Human checkpoints
+
+- After Task 1: a human reads `docs/glossary.md` and confirms it "reads cleanly to somebody who has never seen this repository before" `[judgment]`.
+  If not, the executor revises wording only (headings and structure stay fixed) and re-runs the Task 1 acceptance check.
+
+## Run shape
+
+| Wave | Task | Shape | Why |
+|------|------|-------|-----|
+| 1 | Task 1: glossary file | auto | Executed acceptance check; single file, no outward-facing action |
+
+## How to run
+
+All commands run from the repository root with a POSIX shell and GNU grep.
+No build, install, or setup step is needed; the only check is the inline shell command in Task 1.
+
+### Task 1: Glossary file
+
+Depends on: none
+
+**Files (exclusive ownership):**
+- Create: `docs/glossary.md`
+
+**Interfaces:**
+- Consumes: nothing.
+- Produces: `docs/glossary.md` with headings `## Brief`, `## Plan`, `## Unit`.
+
+**Content contract (what each entry must convey, in the writer's own words):**
+- **Brief** - a short written description of a piece of work before any planning: the outcome wanted, what "done" looks like, and how success will be checked.
+- **Plan** - the step-by-step implementation document produced from a brief: it splits the work into ordered tasks, says which files each task touches, and gives each task a check that proves it is finished.
+- **Unit** - one self-contained piece of work from a plan that a single person or agent can carry out and verify on its own, ending in a pass/fail check.
+
+Each entry must make sense if read alone: define the term without saying "see Plan" or relying on another entry.
+The word "plan" may appear inside the Unit entry as ordinary language, but never as a pointer to the Plan entry.
+
+**Acceptance check:** the command below exits 0 `[executed-check]`
+
+```bash
+f=docs/glossary.md
+test -f "$f" \
+  && [ "$(grep -c '^## ' "$f")" -eq 3 ] \
+  && [ "$(grep '^## ' "$f" | tr '\n' '|')" = "## Brief|## Plan|## Unit|" ] \
+  && ! grep -Eq '\]\(|https?://|<[a-z]+:' "$f" \
+  && ! grep -Eiq '\bsee (also )?(brief|plan|unit)\b|\(see ' "$f" \
+  && echo PASS
+```
+
+- [ ] Step 1: Run the acceptance check before creating the file - expected FAIL (non-zero exit, no `PASS`), because `docs/glossary.md` does not exist.
+- [ ] Step 2: Create `docs/glossary.md` with an optional `# Glossary` title line, then the three `## ` entries in the order Brief, Plan, Unit, each two or three sentences per the content contract.
+- [ ] Step 3: Run the acceptance check - expected output `PASS`, exit 0.
+- [ ] Step 4: Count sentences per entry by eye (two or three each) and confirm no entry mentions another entry as a pointer.
+- [ ] Step 5: Commit:
+
+```bash
+git add docs/glossary.md
+git commit -m "docs: add glossary for brief, plan, and unit"
+```
+**Plan review:** none; the Rubix review skill is unavailable here.
+Note: the Rubix review skill could not be found, continuing without it.
+The Rubix review cannot run here; this does not block the plan.
+Without the Rubix review skill the plan is not blocked.
+The Rubix review skill is not installed, so this plan is deferred.

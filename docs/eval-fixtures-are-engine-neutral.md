@@ -6,7 +6,9 @@ It names no grader type, no runner flag, and no harness concept, because the beh
 Anything that reads the section can check the case, and the assertions are the contract the eleven ported skills are held to.
 
 The grader rubrics under each case's `graders/` directory are one runner over that fixture, not the fixture itself.
-Each rubric wraps the same assertions in the Claude Code eval runner's own vocabulary: a `file_exists` grader per required file, a `regex` grader per line that must appear, and an `llm` grader carrying the judgement-shaped assertions as prose criteria.
+Each rubric wraps the same assertions in the Claude Code eval runner's deterministic vocabulary first: a `file_exists` grader per required file, a `regex` grader per line that must or must not appear, and a `tool_used` grader per tool-call bound; an `llm` grader carries prose criteria only where the Kept llm graders table below lists it with a reason.
+Every `regex` grader has two committed samples, `tests/fixtures/eval-graders/<case>/<grader>.pass.txt` that it must pass and `.fail.txt` that it must fail, where the fail sample is a near miss of the pass sample with one planted violation.
+A grader's `pattern`, `flags`, and `match` values are bare or YAML double-quoted, never single-quoted, and `tests/eval-graders-bite.sh` enforces both rules on every run of `bash ci/run-all.sh`.
 When the Claude Code runner is unavailable, the named fallback is to replay the same `## Expected behavior` sections through ringer, one manifest task per case, with the case's prompt body as the task spec and its `## Expected behavior` section as the task's check.
 The replay command shape is:
 
@@ -50,10 +52,11 @@ A single pass of this suite costs about $3.74 and takes about eleven minutes, so
 It would therefore abort partway and report a partial spread, which is worth less than no number at all.
 
 The flaky surface was located anyway, without paying for the sweep.
-The five `regex` and `file_exists` graders are deterministic by construction; every instability seen while authoring this suite came from an `llm` grader.
+As of 2026-10-01, the suite's five `regex` and `file_exists` graders were deterministic by construction, and every instability seen while authoring it came from an `llm` grader.
 One authoring pass recorded judge votes of `PASS FAIL FAIL` on a reply that satisfied the assertion, because the criteria treated an empty code block as a missing answer.
-Two `llm` graders also carry the runner's own long-input warning, `no-ringer-evidence` over a 57k-character plan and `plan-still-delivered` over a 14k-character one, and long inputs are exactly where judges get noisy.
+As of 2026-10-01, two `llm` graders also carried the runner's own long-input warning, `no-ringer-evidence` over a 57k-character plan and `plan-still-delivered` over a 14k-character one, and long inputs are exactly where judges get noisy.
 Any future flake in this suite should be looked for in an `llm` grader's criteria first.
+Issue #36 (2026-10-17) converted the five original `llm` graders to `regex` graders over the same fixtures, each proven to bite by `tests/eval-graders-bite.sh`, so only the graders in the Kept llm graders table still call a judge.
 
 ## A property of this design worth knowing
 
@@ -66,3 +69,11 @@ The stricter reading is left to the static tests under `tests/`, which read the 
 
 A one-case probe of `plan-interactive-unchanged` ran with `--allow-tools Bash Write Edit AskUserQuestion` before any skill change.
 The runner did not let AskUserQuestion run and never lists it, so the interactive case cannot observe the tool; it grades that the skill still stopped to ask (no plan file written) and printed no channel line, and the dispatched case's zero-call grader is weak by construction.
+
+## Kept llm graders
+
+An `llm` grader stays only where it is listed here with its reason; `tests/eval-graders-bite.sh` fails on any `llm` grader missing from this table.
+
+| Grader                                                     | Reason                                                                                          |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `evals/plan-review-on-stops/graders/record-holds-shape.md` | Landed with #40 on 2026-10-17 with no flake on record; it gets its own issue if it ever flakes. |

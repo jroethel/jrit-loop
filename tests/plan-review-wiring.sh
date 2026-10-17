@@ -20,6 +20,8 @@ for n in 4 5 6 7 8 9; do grep -qE "^## Step $n - " "$P" || fail "$P has no Step 
 [ "$(grep -c '^## Step ' "$P")" = 9 ] || fail "$P should carry exactly nine Step headings"
 grep -qF 'Decline means proceed to Step 4' "$P" || fail "$P: the plan review decline must route to Step 4"
 grep -qF 'Decline means proceed to Step 8' "$P" || fail "$P: the Rubix decline must route to Step 8"
+grep -qF 'Want the Rubix review?' "$P" || fail "$P lost the pinned Rubix offer sentence that evals/rubix-present-offer/graders/one-rubix-offer.md counts"
+grep -qF 'offer the review once, as its own message, after self-review passes, in exactly these words:' "$P" || fail "$P lost the word-for-word pin on the Rubix offer"
 
 for f in skills/loop-plan/references/plan-review.md skills/loop-plan/references/plan-review-template.html; do
   [ -f "$f" ] || fail "$f is missing"

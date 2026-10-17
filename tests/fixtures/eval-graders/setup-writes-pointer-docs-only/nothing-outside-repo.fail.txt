@@ -1,0 +1,21 @@
+I created `repo` as a new git repository and set it up for the loop skills with GitHub as the tracker. All the local file work is done; I haven't committed anything.
+
+**Could not run here:** creating the GitHub labels (`idea`, `agent:todo`, `agent:working`, `agent:needs-input`, `agent:review`, `agent:done`, `wayfinder:map`), because there is no network and `gh` isn't installed.
+
+chain kit not stamped: jrit-core or cezar not found on this machine.
+
+Once `gh` is installed and logged in, re-run `/loop-setup` inside `repo` to create the labels. It won't ask for the tracker mode again. The repo is empty, so there was nothing to bring over from existing work files.
+
+The check, run from the directory that contains `repo`:
+
+```
+executables=0
+outside-repo=2
+```
+
+Files created (no existing files were changed):
+- `repo/.git/` (from `git init`)
+- `repo/docs/loop/pointer.md`, which includes the line `tracker: github`
+- `repo/docs/loop/conventions.md`
+- `repo/AGENTS.md`, which holds only the section between `<!-- jrit-loop:begin -->` and `<!-- jrit-loop:end -->`
+- `repo/CLAUDE.md`, a single line: `@AGENTS.md`

@@ -28,6 +28,8 @@ jobs:
         run: bash ci/version-drift.sh
       - name: Consumer sweep
         run: bash ci/consumer-sweep.sh
+      - name: Eval graders bite test
+        run: bash tests/eval-graders-bite.sh
       - name: Install claude CLI
         run: npm install -g @anthropic-ai/claude-code
       - name: Validate marketplace manifest

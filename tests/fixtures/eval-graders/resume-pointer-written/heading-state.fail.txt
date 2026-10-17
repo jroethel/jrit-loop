@@ -1,0 +1,9 @@
+# Resume pointer: greeting
+## Unit
+greeting
+## State:
+clean
+## Next step
+run it
+## Recent artifacts
+- docs/plan.md
