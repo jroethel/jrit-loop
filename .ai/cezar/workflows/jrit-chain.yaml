@@ -1,0 +1,247 @@
+# jrit-chain: committed brief -> plan -> drive -> review -> local CI -> merge card -> squash push -> CI watch, as one cezar task.
+# Cezar 0.15.0 graph format (version 2). The kit stamp script copies this file to
+# .ai/cezar/workflows/jrit-chain.yaml and the kit scripts to .ai/jrit/; edit the
+# template in jrit-core, never the stamped copy.
+#
+# Start: task text "<brief path> [--from plan|drive|review] [--branch <old branch>]", autonomous off,
+# model opus; restart a stopped run with scripts/chain-restart.sh in jrit-core.
+# Questions: a stage prints its round and ends with JRIT-ASK; <stage>-asked prints the latest
+# round, and an ask-user card shows it with no deadline. Cut-offs: cezar stops any non-final
+# agent step after 30 minutes; <stage>-cut-check lets only that timeout continue the same
+# session through <stage>-resume, and any other agent failure ends at stopped-agent-error.
+# Every failure port left unwired ends the run failed, naming the node or loop in run.error.
+version: 2
+name: jrit-chain
+description: Committed brief to one squash commit pushed to main through the jrit-loop plan, drive and review skills, with question cards and a merge card.
+nodes:
+  - { id: start, type: start }
+  - { id: preflight, type: check, command: "bash .ai/jrit/stage-preflight.sh" }
+  - { id: route-review, type: if, condition: { kind: output, ref: preflight.output, op: contains, value: "Route: review" } }
+  - { id: route-drive, type: if, condition: { kind: output, ref: preflight.output, op: contains, value: "Route: drive" } }
+
+  - id: plan
+    type: agent
+    model: &chain-model opus
+    allowedTools: &stage-tools [Read, Edit, Write, Grep, Glob, Bash, Skill, Agent, ToolSearch, TaskCreate, TaskUpdate, TaskList, TaskGet]
+    prompt: |
+      Preflight for this chain reported:
+      {{nodes.preflight.output}}
+      Use the jrit-loop loop-plan skill on the brief named on the Brief: line above.
+      Run its optional Rubix review without offering it first.
+      Every question you would ask the human, the commit offer included, follows the dispatched-session protocol: print the round as plain text and end your turn.
+      The first line of every round reads "Round <k> of about <N>", where N is your estimate of the rounds this stage needs, counted from the brief's open questions.
+      Keep each round under 3,500 characters, because the card shows only the last 4,000 characters of your reply.
+      The last line of a reply that asks is exactly JRIT-ASK; never print JRIT-ASK in any other reply.
+      Never emit CEZ:ASK or CEZ:DONE: JRIT-ASK is this chain's only question channel, and the graph decides when the task is done.
+      Commit the approved plan, and end with its repo-relative path on the last line.
+  - { id: plan-asked, type: check, command: "bash .ai/jrit/stage-asked.sh" }
+  - { id: plan-has-question, type: if, condition: { kind: output, ref: plan-asked.output, op: contains, value: "Question from the" } }
+  - { id: plan-ask-rounds, type: loop, max: 6 }
+  - { id: plan-ask, type: ask-user, name: "Plan question", question: "Card {{nodes.plan-ask-rounds.iteration}} of at most {{nodes.plan-ask-rounds.max}}\n{{nodes.plan-asked.output}}" }
+  - id: plan-answer
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: plan }
+    prompt: |
+      The human answered your question round:
+      {{nodes.plan-ask.answer}}
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+  - { id: plan-cut-check, type: check, command: "bash .ai/jrit/stage-cut-reason.sh" }
+  - { id: plan-cut-rounds, type: loop, max: 3 }
+  - id: plan-resume
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: plan }
+    prompt: &resume-prompt |
+      Your previous turn was stopped by cezar's 30-minute limit on one agent step, possibly in the middle of a tool call.
+      Continue this stage from where you stopped: check git status and git log first, keep the work already done, and do not restart the stage.
+      The rules of this stage still hold, including JRIT-ASK as the last line of a reply that asks.
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+  - { id: plan-gate, type: check, command: "bash .ai/jrit/stage-gate.sh plan" }
+  - { id: plan-fix-rounds, type: loop, max: 2 }
+  - id: plan-fix
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: plan }
+    prompt: |
+      The plan gate failed; its output is appended below.
+      Fix the plan so the gate passes, commit it, and end with its path on the last line.
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+
+  - id: drive
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    prompt: |
+      Preflight for this chain reported:
+      {{nodes.preflight.output}}
+      Take it from here: use the jrit-loop loop-drive skill to drive the plan that `python3 .ai/jrit/plan_tool.py find-plan` prints, with this branch as the integration branch.
+      If a _loop.md for that plan already exists on this branch, resume from it.
+      Units go out as cezar child tasks, as loop-drive's cezar transport says; after you dispatch a batch, ending your turn with no marker is the expected way to wait, because cezar parks you and wakes you when a child reports.
+      When nothing is left to dispatch but a child still runs, end your turn with the single line CEZ:MONITORING.
+      Every question you would ask the human follows the dispatched-session protocol: print the round as plain text and end your turn.
+      The first line of every round reads "Round <k> of about <N>", where N is your estimate of the rounds this stage needs.
+      Keep each round under 3,500 characters, because the card shows only the last 4,000 characters of your reply.
+      The last line of a reply that asks is exactly JRIT-ASK; never print JRIT-ASK in any other reply.
+      Never emit CEZ:ASK or CEZ:DONE: JRIT-ASK is this chain's only question channel, and the graph decides when the task is done.
+      Commit every unit's work on this branch before you end your last turn.
+  - { id: drive-asked, type: check, command: "bash .ai/jrit/stage-asked.sh" }
+  - { id: drive-has-question, type: if, condition: { kind: output, ref: drive-asked.output, op: contains, value: "Question from the" } }
+  - { id: drive-ask-rounds, type: loop, max: 6 }
+  - { id: drive-ask, type: ask-user, name: "Drive question", question: "Card {{nodes.drive-ask-rounds.iteration}} of at most {{nodes.drive-ask-rounds.max}}\n{{nodes.drive-asked.output}}" }
+  - id: drive-answer
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: drive }
+    prompt: |
+      The human answered your question round:
+      {{nodes.drive-ask.answer}}
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+  - { id: drive-cut-check, type: check, command: "bash .ai/jrit/stage-cut-reason.sh" }
+  - { id: drive-cut-rounds, type: loop, max: 8 }
+  - id: drive-resume
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: drive }
+    prompt: *resume-prompt
+  - { id: drive-gate, type: check, command: "bash .ai/jrit/stage-gate.sh drive" }
+  - { id: drive-fix-rounds, type: loop, max: 2 }
+  - id: drive-fix
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: drive }
+    prompt: |
+      The drive gate failed; its output is appended below.
+      Fix the failing work on this branch without editing the plan's acceptance checks, commit, and end your turn.
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+
+  - id: review
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    verdicts: [approve, changes]
+    prompt: |
+      Preflight for this chain reported:
+      {{nodes.preflight.output}}
+      Use the jrit-loop loop-review skill on this branch's diff since its merge base with the branch on the Base: line above.
+      Do not ask the human anything in this stage: write any question as a finding.
+      Never emit CEZ:ASK or CEZ:DONE; end with the verdict line cezar asks for.
+      List every finding that must be fixed before merge.
+      Choose changes when that list is not empty, otherwise approve.
+  - { id: review-cut-check, type: check, command: "bash .ai/jrit/stage-cut-reason.sh" }
+  - { id: review-cut-rounds, type: loop, max: 2 }
+  - { id: review-rounds, type: loop, max: 2 }
+  - id: review-fix
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: drive }
+    prompt: |
+      Review asked for these fixes before merge:
+      {{nodes.review.summary}}
+      Fix them on this branch, commit, and end your turn.
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+
+  - { id: commit, type: git.commit, message: "Finish the chain for {{task}}" }
+  - { id: commit-ownership, type: check, command: "bash .ai/jrit/stage-gate.sh ownership" }
+  - { id: local-ci, type: check, command: "bash .ai/jrit/stage-end.sh local-ci" }
+  - { id: ci-fix-rounds, type: loop, max: 2 }
+  - id: ci-fix
+    type: agent
+    model: *chain-model
+    allowedTools: *stage-tools
+    session: { continue: drive }
+    prompt: |
+      This repo's local CI or the ownership check after the commit failed; its output is appended below.
+      Fix the cause on this branch (remove a file the plan does not own rather than adding it to the plan), commit, and end your turn.
+      Never emit CEZ:ASK or CEZ:DONE; JRIT-ASK stays the only question channel.
+  - { id: merge-card-text, type: check, command: "bash .ai/jrit/stage-end.sh merge-card" }
+  - { id: merge, type: gate.human, name: "Merge to main", message: "{{nodes.merge-card-text.output}}" }
+  - { id: merge-push, type: check, command: "bash .ai/jrit/stage-end.sh merge-push" }
+  - { id: ci-watch, type: check, command: "bash .ai/jrit/stage-end.sh ci-watch" }
+  - { id: ci-red, type: gate.human, name: "GitHub CI is red", message: "{{nodes.ci-watch.output}}\nIf the output above names failing jobs, the three commands above undo the push; if it says nothing is known to be broken, check the Actions tab and do not undo. Approve or reject: either one ends this run as failed with this card as its reason." }
+  - { id: ok, type: end, status: success }
+  - { id: merge-rejected, type: end, status: failed }
+  - { id: ci-red-after-push, type: end, status: failed }
+  - { id: stopped-agent-error, type: end, status: failed }
+edges:
+  - { from: start, to: preflight }
+  - { from: preflight.pass, to: route-review }
+  - { from: route-review.true, to: drive-gate }
+  - { from: route-review.false, to: route-drive }
+  - { from: route-drive.true, to: drive }
+  - { from: route-drive.false, to: plan }
+
+  - { from: plan.done, to: plan-asked }
+  - { from: plan.failed, to: plan-cut-check }
+  - { from: plan-cut-check.pass, to: plan-cut-rounds }
+  - { from: plan-cut-check.fail, to: stopped-agent-error }
+  - { from: plan-cut-rounds.repeat, to: plan-resume }
+  - { from: plan-resume.done, to: plan-asked }
+  - { from: plan-resume.failed, to: plan-cut-check }
+  - { from: plan-asked.pass, to: plan-has-question }
+  - { from: plan-has-question.true, to: plan-ask-rounds }
+  - { from: plan-has-question.false, to: plan-gate }
+  - { from: plan-ask-rounds.repeat, to: plan-ask }
+  - { from: plan-ask.answered, to: plan-answer }
+  - { from: plan-answer.done, to: plan-asked }
+  - { from: plan-answer.failed, to: plan-cut-check }
+  - { from: plan-gate.pass, to: drive }
+  - { from: plan-gate.fail, to: plan-fix-rounds }
+  - { from: plan-fix-rounds.repeat, to: plan-fix }
+  - { from: plan-fix.done, to: plan-asked }
+  - { from: plan-fix.failed, to: plan-cut-check }
+
+  - { from: drive.done, to: drive-asked }
+  - { from: drive.failed, to: drive-cut-check }
+  - { from: drive-cut-check.pass, to: drive-cut-rounds }
+  - { from: drive-cut-check.fail, to: stopped-agent-error }
+  - { from: drive-cut-rounds.repeat, to: drive-resume }
+  - { from: drive-resume.done, to: drive-asked }
+  - { from: drive-resume.failed, to: drive-cut-check }
+  - { from: drive-asked.pass, to: drive-has-question }
+  - { from: drive-has-question.true, to: drive-ask-rounds }
+  - { from: drive-has-question.false, to: drive-gate }
+  - { from: drive-ask-rounds.repeat, to: drive-ask }
+  - { from: drive-ask.answered, to: drive-answer }
+  - { from: drive-answer.done, to: drive-asked }
+  - { from: drive-answer.failed, to: drive-cut-check }
+  - { from: drive-gate.pass, to: review }
+  - { from: drive-gate.fail, to: drive-fix-rounds }
+  - { from: drive-fix-rounds.repeat, to: drive-fix }
+  - { from: drive-fix.done, to: drive-asked }
+  - { from: drive-fix.failed, to: drive-cut-check }
+
+  - { from: review.approve, to: commit }
+  - { from: review.changes, to: review-rounds }
+  - { from: review.failed, to: review-cut-check }
+  - { from: review-cut-check.pass, to: review-cut-rounds }
+  - { from: review-cut-check.fail, to: stopped-agent-error }
+  - { from: review-cut-rounds.repeat, to: review }
+  - { from: review-rounds.repeat, to: review-fix }
+  - { from: review-fix.done, to: drive-asked }
+  - { from: review-fix.failed, to: drive-cut-check }
+
+  - { from: commit.done, to: commit-ownership }
+  - { from: commit.nothing, to: commit-ownership }
+  - { from: commit-ownership.pass, to: local-ci }
+  - { from: commit-ownership.fail, to: ci-fix-rounds }
+  - { from: local-ci.pass, to: merge-card-text }
+  - { from: local-ci.fail, to: ci-fix-rounds }
+  - { from: ci-fix-rounds.repeat, to: ci-fix }
+  - { from: ci-fix.done, to: drive-asked }
+  - { from: ci-fix.failed, to: drive-cut-check }
+  - { from: merge-card-text.pass, to: merge }
+  - { from: merge.approve, to: merge-push }
+  - { from: merge.reject, to: merge-rejected }
+  - { from: merge-push.pass, to: ci-watch }
+  - { from: ci-watch.pass, to: ok }
+  - { from: ci-watch.fail, to: ci-red }
+  - { from: ci-red.approve, to: ci-red-after-push }
+  - { from: ci-red.reject, to: ci-red-after-push }
