@@ -22,6 +22,7 @@ Always `node "$CEZ_BIN"`, never a `cez` found on PATH: the cockpit pins the engi
 Never with `--budget`: a child at its budget brake parks `waiting` and stalls the wave, and loop caps are the only ceiling (M7 as revised).
 Dispatch a wave's units in batches of at most 4 unfinished children, which is cezar's in-flight limit.
 Record each child id and branch from the `dispatched <id> on branch <branch>` line in the unit's `AGENT STATUS` receipt.
+The child's spec never carries this parent's marker rules: a child is its own cezar task, and it ends its final turn with the single line `CEZ:DONE` once its acceptance check passes, which is how cezar settles the task; a child that reports without it parks `waiting` and shows as needing attention although nothing is owed.
 
 ## Wait
 
@@ -35,7 +36,7 @@ curl -s "$CEZ_API_URL/api/v1/p/$CEZ_PROJECT_ID/runs/<id>" | jq -r '.status + " "
 ```
 
 A polling parent holds a slot and slowly burns its 30-minute step limit, and `maxParallel` 6 leaves room for exactly that; if the step cuts off mid-wait, the run continues the same session and picks the children up again under Resume after a cut-off.
-Never emit `CEZ:ASK` or `CEZ:DONE`.
+The parent never emits `CEZ:ASK` or `CEZ:DONE`; this rule is the parent's alone and never reaches a child's spec.
 
 ## Stuck children
 
