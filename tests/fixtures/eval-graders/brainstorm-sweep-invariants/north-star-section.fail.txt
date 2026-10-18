@@ -1,0 +1,9 @@
+# Brief
+
+## Outcome
+Find an article fast.
+
+The north star and invariants are discussed below.
+
+## Parking lot
+- A team-wide log

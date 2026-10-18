@@ -1,0 +1,10 @@
+# Brief
+
+## Outcome
+Find an article fast.
+
+## North star and invariants
+A shared reading graph.
+
+## Parking lot
+- A team-wide log
