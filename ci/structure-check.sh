@@ -207,8 +207,9 @@ $hit"
 # ---------------------------------------------------------------------------
 # Check H: loop-drive's portable core names no harness primitive.
 # Scans skills/loop-drive/SKILL.md and skills/loop-drive/references/* except
-# harness-appendix-claude-code.md, and fails on the literal SendMessage, the
-# backticked `Agent`, and the slash commands /goal and /loop.
+# the harness appendices (harness-appendix-*.md), and fails on the literal
+# SendMessage, the backticked `Agent` and `subagents` (pi), and the slash
+# commands /goal and /loop.
 #
 # The slash patterns carry BOTH boundaries: a trailing class, ($|[^a-z-]), and
 # a leading class, (^|[^A-Za-z0-9./]). Without the trailing class /loop-drive
@@ -218,9 +219,8 @@ $hit"
 # Check D conflict at the wave-2 gate). The ban is on slash-command
 # invocations, not on skill names or paths that share the substring.
 #
-# Exactly one sanctioned pointer sentence may name the appendix, so the core can
-# say where the harness detail went without restating it; more than one such
-# sentence fails, naming both.
+# Each appendix gets exactly one sanctioned pointer, so the core can say where
+# the harness detail went without restating it; zero or more than one fails.
 # ---------------------------------------------------------------------------
 slash_command_hit() {
   # slash_command_hit <line> <command>: true when <line> contains <command>
@@ -238,7 +238,7 @@ check_h() {
   local rf
   for rf in skills/loop-drive/references/*; do
     [ -f "$rf" ] || continue
-    [ "$(basename "$rf")" = "harness-appendix-claude-code.md" ] && continue
+    case "$(basename "$rf")" in harness-appendix-*.md) continue ;; esac
     h_files+=("$rf")
   done
   if [ ${#h_files[@]} -gt 0 ]; then
@@ -247,10 +247,13 @@ check_h() {
       while IFS= read -r line || [ -n "$line" ]; do
         ln_no=$((ln_no + 1))
         if [[ $line == *SendMessage* ]]; then
-          fail "check H: $f:$ln_no names SendMessage; harness primitives live only in references/harness-appendix-claude-code.md"
+          fail "check H: $f:$ln_no names SendMessage; harness primitives live only in references/harness-appendix-*.md"
         fi
         if [[ $line == *'`Agent`'* ]]; then
-          fail "check H: $f:$ln_no names the backticked '\`Agent\`' tool; harness primitives live only in references/harness-appendix-claude-code.md"
+          fail "check H: $f:$ln_no names the backticked '\`Agent\`' tool; harness primitives live only in references/harness-appendix-*.md"
+        fi
+        if [[ $line == *'`subagents`'* ]]; then
+          fail "check H: $f:$ln_no names the backticked '\`subagents\`' tool; harness primitives live only in references/harness-appendix-*.md"
         fi
         if slash_command_hit "$line" "/goal"; then
           fail "check H: $f:$ln_no invokes the /goal slash command; user-invoked slash commands cannot be invoked from skill prose (see the appendix instead)"
@@ -260,23 +263,27 @@ check_h() {
         fi
       done < "$f"
     done
-    ptr_count=0
-    pointers=""
-    for f in "${h_files[@]}"; do
-      c=$(grep -cF 'harness-appendix-claude-code.md' "$f" || true)
-      ptr_count=$((ptr_count + c))
-      pointers="$pointers$(grep -nF 'harness-appendix-claude-code.md' "$f" 2>/dev/null | sed "s|^|$f:|")"
-    done
-    if [ "$ptr_count" -gt 1 ]; then
-      fail "check H: the portable core names the appendix $ptr_count times; exactly one sanctioned pointer sentence is allowed:
+    local appx base
+    for appx in skills/loop-drive/references/harness-appendix-*.md; do
+      base=$(basename "$appx")
+      ptr_count=0
+      pointers=""
+      for f in "${h_files[@]}"; do
+        c=$(grep -cF "$base" "$f" || true)
+        ptr_count=$((ptr_count + c))
+        pointers="$pointers$(grep -nF "$base" "$f" 2>/dev/null | sed "s|^|$f:|")"
+      done
+      if [ "$ptr_count" -gt 1 ]; then
+        fail "check H: the portable core names $base $ptr_count times; exactly one sanctioned pointer is allowed:
 $pointers"
-    fi
-    if [ -f skills/loop-drive/SKILL.md ] && [ "$ptr_count" -eq 0 ]; then
-      fail "check H: skills/loop-drive/SKILL.md exists but its core never points to references/harness-appendix-claude-code.md; the split's contract is that the core says where the harness detail went"
-    fi
+      fi
+      if [ -f skills/loop-drive/SKILL.md ] && [ "$ptr_count" -eq 0 ]; then
+        fail "check H: skills/loop-drive/SKILL.md exists but its core never points to references/$base; the split's contract is that the core says where the harness detail went"
+      fi
+    done
   fi
   shopt -u nullglob
-  ok "H - loop-drive portable core names no harness primitive, with at most one appendix pointer"
+  ok "H - loop-drive portable core names no harness primitive, with one pointer per harness appendix"
 }
 
 declare -A ALLOWED=()

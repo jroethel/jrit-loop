@@ -1,6 +1,6 @@
 # Harness appendix: Claude Code
 
-The portable core of this skill names no harness primitive; this appendix names them all, and it is the only loop-drive file that does.
+The portable core of this skill names no harness primitive; this appendix names Claude Code's, and the harness appendices (this one and `references/harness-appendix-pi.md`) are the only loop-drive files that do.
 Read it when at least one unit takes the background-agent transport (the Conditional reads block in the SKILL carries the trigger).
 The verdicts below are the 2026-09-13 seam-0 findings, verified live against `claude` 2.1.269.
 

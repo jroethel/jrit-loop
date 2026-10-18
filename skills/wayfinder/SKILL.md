@@ -134,6 +134,10 @@ User invokes with a loose idea.
 3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now**, attached to the map per your backend, then wire `Blocked by: #N` edges in a **second pass** (issues need numbers first). Wiring sorts them into frontier vs blocked; the rest stays in **Not yet specified**.
 5. **Fire the research subagents.** For each `research` ticket, spin up a fresh-context research subagent in parallel, capturing findings on a throwaway `research/<name>` branch with a context pointer from the ticket.
+   **Probe.** Check whether this session has a tool that starts a fresh-context subagent.
+   **Present:** fire them as this step says.
+   **Absent:** research nothing in this session, because research done here is anchored by the charting you just did; leave every `research` ticket open on the frontier, and each one resolves later in its own fresh session through Work through the map, one ticket per session like any other.
+   **Disclose:** say in one line "No fresh-context subagent tool in this session; research tickets stay on the frontier for a fresh session each."
 6. Stop - charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
