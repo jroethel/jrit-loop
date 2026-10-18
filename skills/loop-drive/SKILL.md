@@ -68,6 +68,7 @@ Probe both optional substrates before routing.
 Units go to cezar when its probe is present, else to ringer when its probe is present; a unit that needs in-session tools or mid-flight continuation goes to herdr panes when that probe is present.
 When a unit is left with no transport, or ringer, herdr, and cezar are all absent, stop the automated drive and emit the human-paced run-book (Human-paced output mode) instead, so each unit still gets a fresh session.
 **Disclose:** when absent, say in one line in the emitted plan's pre-flight "no fresh-context subagent tool in this session; the background-agent transport is off and the compile ran in this session."
+When ringer is absent too, this line replaces ringer's Disclose line, which would otherwise claim the background-agent transport is the one left.
 
 **Probe.** Run `[ -n "$HERDR_ENV" ] && command -v herdr >/dev/null 2>&1`; when it succeeds, check compatibility at probe time with `herdr api schema --json` and never against a pinned version number.
 **Present:** workers may be dispatched into herdr panes via `herdr api` instead of background agents.
