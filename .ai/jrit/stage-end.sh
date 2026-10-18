@@ -2,7 +2,7 @@
 # Chain ending scripts: local CI, the merge card, squash-merge and push, GitHub CI watch.
 # Run as `bash .ai/jrit/stage-end.sh <subcommand>` with cwd = the run worktree.
 # Reads the preflight state files from the git dir (jrit-chain-base|brief|issue)
-# and .ai/jrit/kit.conf; depends on bash, git, and jq only.
+# and .ai/jrit/kit.conf; depends on bash, git, jq, python3, and gh.
 set -uo pipefail
 
 SUB="${1:-}"
@@ -12,6 +12,7 @@ case "$SUB" in
 esac
 
 [ -f .ai/jrit/kit.conf ] && . ./.ai/jrit/kit.conf
+. ./.ai/jrit/kit-lib.sh || { echo "$SUB: cannot load .ai/jrit/kit-lib.sh; restamp the chain kit"; exit 1; }
 GH=${GH_COMMAND:-gh}
 
 state() {
@@ -38,18 +39,11 @@ clean_tree() {
 }
 
 kit_same() {
-  local base=$1 B=$2 p bad=""
-  while IFS= read -r p; do
-    git diff --quiet "$base" HEAD -- "$p" || bad="$bad$p
-"
-  done < <(git ls-tree -r --name-only "$base" -- .ai/jrit .ai/cezar/workflows/jrit-chain.yaml)
-  while IFS= read -r p; do
-    git cat-file -e "$base:$p" 2>/dev/null || bad="$bad$p
-"
-  done < <(git ls-tree -r --name-only HEAD -- .ai/jrit)
+  local base=$1 B=$2 bad
+  bad=$(kit_diff "$base")
   if [ -n "$bad" ]; then
     echo "$SUB: the chain kit on this branch differs from $B:"
-    printf '%s' "$bad"
+    printf '%s\n' "$bad"
     exit 1
   fi
 }
@@ -87,7 +81,7 @@ local_ci() {
 }
 
 merge_card() {
-  local base B RB brief N plan ids id mb rv p blocks found
+  local base B RB brief N plan ids id mb rv p blocks found moved sha
   clean_tree
   base=$(need_state jrit-chain-base); B=${base#origin/}
   RB=$(git branch --show-current)
@@ -108,6 +102,14 @@ merge_card() {
   fi
   if [ -n "$ids" ]; then
     while IFS= read -r id; do echo "- Task $id"; done <<<"$ids"
+  else
+    echo "none"
+  fi
+
+  echo "Acceptance checks a later task moved (they pass at their own commit; confirm the move was intended):"
+  moved=$(state jrit-chain-moved 2>/dev/null) || moved=""
+  if [ -n "$moved" ]; then
+    while read -r id sha; do echo "- Task $id (passes at its own commit $sha)"; done <<<"$moved"
   else
     echo "none"
   fi
@@ -137,7 +139,7 @@ merge_card() {
 # RB is deliberately not local: the EXIT trap runs after this function
 # returns, and the restore handler still needs the branch name.
 merge_push() {
-  local base B N brief title sha ci_out out f files root
+  local base B N brief title sha ci_out out f files root del
   clean_tree
   base=$(need_state jrit-chain-base); B=${base#origin/}
   RB=$(git branch --show-current)
@@ -177,7 +179,9 @@ merge_push() {
   fi
   sha=$(git rev-parse HEAD)
   printf '%s\n' "$sha" > "$(git rev-parse --git-path jrit-chain-pushed)"
-  git branch -D "jrit/chain-I$N" >/dev/null 2>&1 || :
+  if ! del=$(git branch -D "jrit/chain-I$N" 2>&1); then
+    echo "merge-push: pushed, but could not delete jrit/chain-I$N: $(printf '%s\n' "$del" | head -n 1)"
+  fi
   root=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
   echo "local $B is behind origin; to update it run: git -C $root merge --ff-only origin/$B"
   echo "pushed ${sha:0:12} to origin $B"

@@ -5,6 +5,11 @@ acceptance checks, and enforce its ownership lists.
 Stdlib only, deterministic, run from the repo root. Exit 0 = clean.
 Fenced code blocks never count as plan structure; their only role is to
 carry an acceptance command's body.
+
+An ownership span written path:lines (loop-plan's own task template writes
+path:123-145) owns the path. run-checks reruns a failing check at its task's
+own commit when a base is known; a pass there is reported MOVED, not FAIL, and
+recorded in the git-dir file jrit-chain-moved (one "<id> <sha12>" per line).
 """
 import argparse
 import fnmatch
@@ -26,7 +31,9 @@ DEP_ID_RE = re.compile(r"Task\s+(\d+[a-z]?)")
 UNFAILABLE_TAIL_RE = re.compile(r"(\|\||;)\s*(true|:|exit(\s+0)?)\s*$")
 SEGMENT_RE = re.compile(r"&&|\|\||;|\||\n")
 FILES_HEADER = "**Files (exclusive ownership):**"
+LINES_RE = re.compile(r":\d[\d,-]*$")
 BASE_KEY = "jrit-chain-base"
+MOVED_KEY = "jrit-chain-moved"
 NO_BASE_MSG = "no base: pass --base or run preflight first"
 NEVER_OWNED_MSG = "(the chain kit and docs/loop/ are never plan-owned)"
 MARKER = "[executed-check]"
@@ -279,6 +286,30 @@ def pointer_home(key, default):
     return default
 
 
+def owned_path(span, top):
+    """The repo-relative path an ownership span owns, or None."""
+    if " " in span:
+        return None
+    if span.startswith(top + "/"):
+        span = span[len(top) + 1:]
+    elif span[:1] in ("/", "~", "$"):
+        return None
+    return LINES_RE.sub("", span)
+
+
+def own_commit(task, mb):
+    """Newest first-parent commit after mb touching a path the task owns."""
+    top = git_out(["rev-parse", "--show-toplevel"]).strip()
+    paths = [owned_path(span, top) for bullet in task["bullets"]
+             for span in SPAN_RE.findall(bullet)]
+    paths = [p for p in paths if p]
+    if not paths:
+        return None
+    out = git_out(["log", "--first-parent", "--format=%H", "-1",
+                   "{}..HEAD".format(mb), "--"] + paths)
+    return out.strip() or None
+
+
 def allowed(path, entry):
     if entry.endswith("/"):
         return path == entry[:-1] or path.startswith(entry)
@@ -333,6 +364,9 @@ def cmd_check(args):
 def cmd_run_checks(args):
     lines, inside, tasks = analyze(read_file(args.plan))
     humans = set(human_ids(lines, inside))
+    base = args.base or recorded_base()
+    mb = merge_base(base) if base else None
+    moved = []
     ran = failed = 0
     for t in tasks:
         if t["id"] in humans:
@@ -347,6 +381,12 @@ def cmd_run_checks(args):
             if p.returncode == 0:
                 print("PASS task {}".format(t["id"]))
             else:
+                sha = own_commit(t, mb) if mb else None
+                if sha and run_at_base(t["command"] or "", sha) == 0:
+                    moved.append("{} {}".format(t["id"], sha[:12]))
+                    print("MOVED task {}: fails on the finished tree, passes "
+                          "at its own commit {}".format(t["id"], sha[:12]))
+                    continue
                 failed += 1
                 code = p.returncode if p.returncode >= 0 else 128 - p.returncode
                 print("FAIL task {}: exit {}".format(t["id"], code))
@@ -355,6 +395,9 @@ def cmd_run_checks(args):
             print("FAIL task {}: timed out after 1800 s".format(t["id"]))
         for line in output.splitlines()[-40:]:
             print("  {}".format(line))
+    path = git_out(["rev-parse", "--git-path", MOVED_KEY]).strip()
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("".join(m + "\n" for m in moved))
     if failed:
         print("drive gate: {} of {} acceptance checks failed".format(failed, ran))
         return 1
@@ -385,13 +428,9 @@ def cmd_ownership(args):
     for t in tasks:
         for bullet in t["bullets"]:
             for span in SPAN_RE.findall(bullet):
-                if " " in span:
-                    continue
-                if span.startswith(top + "/"):
-                    span = span[len(top) + 1:]
-                elif span[:1] in ("/", "~", "$"):
-                    continue
-                entries.append(span)
+                entry = owned_path(span, top)
+                if entry:
+                    entries.append(entry)
     outside = 0
     for path in changed:
         if path.startswith(".ai/") or path.startswith("docs/loop/"):
@@ -422,6 +461,7 @@ def main(argv):
 
     p = sub.add_parser("run-checks", help="run every acceptance check")
     p.add_argument("plan")
+    p.add_argument("--base")
     p.set_defaults(func=cmd_run_checks)
 
     p = sub.add_parser("human-tasks", help="ids of human-shaped tasks")

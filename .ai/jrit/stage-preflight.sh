@@ -99,20 +99,12 @@ if [ -n "$old" ]; then
 fi
 
 # 10. kit integrity: the kit and the graph match the base branch
-bad=""
-while IFS= read -r p; do
-  [ -n "$p" ] || continue
-  if [ "$(git rev-parse -q --verify "HEAD:$p")" != "$(git rev-parse -q --verify "$CEZ_BASE:$p")" ]; then
-    bad="$bad$p
-"
-  fi
-done <<EOF
-$({ git ls-tree -r --name-only HEAD -- .ai/jrit; git ls-tree -r --name-only "$CEZ_BASE" -- .ai/jrit; printf '%s\n' "$graph"; } | sort -u)
-EOF
+. ./.ai/jrit/kit-lib.sh || die "cannot load .ai/jrit/kit-lib.sh; restamp the chain kit"
+bad=$(kit_diff "$CEZ_BASE")
 if [ -n "$bad" ]; then
   {
     echo "preflight: the chain kit on this branch differs from $CEZ_BASE:"
-    printf '%s' "$bad"
+    printf '%s\n' "$bad"
   } >&2
   exit 1
 fi
