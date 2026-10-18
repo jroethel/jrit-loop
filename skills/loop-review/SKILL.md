@@ -8,7 +8,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies.
 - **Spec** - does the code faithfully implement the originating plan, brief, issue, or PRD?
 - **Standards** - does the code conform to this repo's documented coding standards, plus a baseline set of code smells?
 
-Both axes run as parallel fresh-context subagents so they don't pollute each other's context, then this skill aggregates their findings side by side, never merged.
+Both axes run as parallel fresh-context subagents so they don't pollute each other's context (a harness without a subagent tool gets the degraded path in step 5), then this skill aggregates their findings side by side, never merged.
 It has no setup dependency - runs in any repo, even one with zero loop or issue-tracker conventions.
 
 ## Process
@@ -82,6 +82,11 @@ Name only the resolved source - not any other plan or brief file discovery consi
 This block is the skill's basis-before-findings contract, and always precedes `## Spec` and `## Standards`.
 
 ### 5. Spawn both subagents in parallel
+
+**Probe.** Check whether this session has a tool that starts a fresh-context subagent (in Claude Code, the `Agent` tool).
+**Present:** run the two axes as subagents, as the rest of this step says.
+**Absent:** run the two axes yourself, Standards first and then Spec, each from the same prompt contents this step lists; the second axis is read with the first already in context, so its independence is lost.
+**Disclose:** when absent, put this exact line once, as the first line of the disclosure block from step 4: "Degraded: no fresh-context subagent tool in this session, so the Spec and Standards axes ran in one context and are not independent."
 
 Send a single message with two `Agent` tool calls, both `general-purpose` at medium reasoning effort.
 Choose the reviewer model by its role (a review/validation gate) per the user's routing conventions if present, else the session's default capable model; do not hard-pin a model name.
