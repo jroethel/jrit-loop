@@ -22,7 +22,7 @@ The principle IDs cited below (P2, P6, P7, P10, P11, P12, P14) carry short gloss
 
 ## Step boundary and entry points
 
-The driving session does not compile the plan inline.
+The driving session does not compile the plan inline, unless Step 0's subagent probe is absent.
 Steps 1-4 and Step 6 - extract the skeleton, assign roles and models, neutralize the hazards, convert the prompt templates, and emit the plan - are compiled by ONE fresh-context dispatch at the drive-compile dispatch role pin; cite the role pin by that name, never a bare model id mid-prose (its model lives in the Role pins table of `references/model-benchmarks.md`).
 The driving session keeps Step 0 (route and scope), a pin review of the compiled output against this skill's rules, the Step 5 gates, and the Step 7 launch.
 
@@ -35,7 +35,7 @@ Nothing under `references/` is an always-read; each file is pulled at its trigge
 
 - `references/model-benchmarks.md`: read when a routing decision arises - Step 2 unit assignment, a runtime re-route at a gate, human-paced per-unit model choice, or resolving a role pin's model at dispatch. Step 0 triage, a CHAT or DON'T BOTHER exit, and the pin review of an existing `_loop.md` do not read it.
 - `references/ringer-substrate.md`: read when at least one unit takes the ringer transport; never read in degraded mode (ringer absent).
-- `references/harness-appendix-claude-code.md`: read when at least one unit takes the background-agent transport; it is the single home of this skill's harness-specific mechanics and the only loop-drive file that names a harness primitive.
+- The harness appendix that matches this session - `references/harness-appendix-claude-code.md` in Claude Code, `references/harness-appendix-pi.md` in pi: read when at least one unit takes the background-agent transport, or when the compile dispatch is about to fire; the appendices are the single home of this skill's harness-specific mechanics and the only loop-drive files that name a harness primitive.
 - `references/fable-guidelines.md`: read only in human-paced output mode, before drafting the run-book.
 - `references/reviewer-conduct-contract.md`: read when validators are about to be dispatched (compiling Step 4 templates, or launching from an existing `_loop.md`); the fail-closed stop on a missing file is unchanged.
 - `references/one-minute-test.md`: read on every fresh-plan entry at Step 0; the existing-`_loop.md` entry point skips it.
@@ -61,6 +61,14 @@ Probe both optional substrates before routing.
 **Present:** ringer is available as a worker transport, and its scoreboard is the top evidence tier of the routing chain.
 **Absent:** every unit takes the harness's own background-agent transport, and routing skips the top evidence tier entirely, falling back to benchmark prior then orchestrator pin.
 **Disclose:** say in one line, in the emitted plan's pre-flight, "ringer not found at the probed path; running degraded: background-agent transport only, routing by prior."
+
+**Probe.** Check whether this session has a tool that starts a fresh-context subagent; the harness appendices name it per harness.
+**Present:** the background-agent transport is available, and the compile runs as the one fresh-context dispatch Step boundary describes.
+**Absent:** the background-agent transport is unavailable, and the compile runs in this session.
+Units go to cezar when its probe is present, else to ringer when its probe is present; a unit that needs in-session tools or mid-flight continuation goes to herdr panes when that probe is present.
+When a unit is left with no transport, or ringer, herdr, and cezar are all absent, stop the automated drive and emit the human-paced run-book (Human-paced output mode) instead, so each unit still gets a fresh session.
+**Disclose:** when absent, say in one line in the emitted plan's pre-flight "no fresh-context subagent tool in this session; the background-agent transport is off and the compile ran in this session."
+When ringer is absent too, this line replaces ringer's Disclose line, which would otherwise claim the background-agent transport is the one left.
 
 **Probe.** Run `[ -n "$HERDR_ENV" ] && command -v herdr >/dev/null 2>&1`; when it succeeds, check compatibility at probe time with `herdr api schema --json` and never against a pinned version number.
 **Present:** workers may be dispatched into herdr panes via `herdr api` instead of background agents.

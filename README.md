@@ -5,7 +5,7 @@ A raw idea goes in one end, and brainstorming, planning, execution, review, and 
 
 ## Install
 
-<!-- jrit-loop-version: 0.5.0 -->
+<!-- jrit-loop-version: 0.5.1 -->
 
 From a Claude Code marketplace:
 
