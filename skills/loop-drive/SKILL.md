@@ -1,6 +1,6 @@
 ---
 name: loop-drive
-description: Use when you have a multi-step plan, PRD, or hand-off run-book (steps or work packages, with or without copy-paste prompts) and want a single frontier-model session to orchestrate its execution instead of a human pasting prompts by hand. Also use to kick off a new project, break a big task into per-step prompts, route steps across model tiers ("which model should do this"), produce a human-paced Frontier-Sandwich run-book, or answer "is this worth automating / how should I run this plan" (the One-Minute Test front door for a plan in hand). Covers ringer-transported and background-agent-transported workers, mixed freely within a wave, and cezar child-task workers when it runs inside a cezar task. Not for a one-off single-answer task.
+description: Use when you have a multi-step plan, PRD, or hand-off run-book (steps or work packages, with or without copy-paste prompts) and want a single frontier-model session to orchestrate its execution instead of a human pasting prompts by hand. Also use to kick off a new project, break a big task into per-step prompts, route steps across model tiers ("which model should do this"), produce a human-paced Frontier-Sandwich run-book, or answer "is this worth automating / how should I run this plan" (the One-Minute Test front door for a plan in hand). Covers ringer-transported and background-agent-transported workers, mixed freely within a wave, and it stops instead of driving when it runs inside a cezar task, where the chain owns the drive. Not for a one-off single-answer task.
 ---
 
 # loop-drive: hand-off plan to orchestration plan
@@ -39,7 +39,7 @@ Nothing under `references/` is an always-read; each file is pulled at its trigge
 - `references/fable-guidelines.md`: read only in human-paced output mode, before drafting the run-book.
 - `references/reviewer-conduct-contract.md`: read when validators are about to be dispatched (compiling Step 4 templates, or launching from an existing `_loop.md`); the fail-closed stop on a missing file is unchanged.
 - `references/one-minute-test.md`: read on every fresh-plan entry at Step 0; the existing-`_loop.md` entry point skips it.
-- `references/cezar-transport.md`: read when the environment variable `CEZ_TASK_ID` is set, before Step 0's probes; it holds the cezar task transport's probe, dispatch, gate, and repair mechanics.
+- `references/cezar-transport.md`: read when the environment variable `CEZ_TASK_ID` is set, before Step 0's probes; it holds the cezar probe and what this skill does inside a cezar task.
 
 `references/queue-runner.md` is not a read for this skill at all: it is a standalone pasteable operator prompt homed here, pinned by its own gate test.
 
@@ -65,8 +65,8 @@ Probe both optional substrates before routing.
 **Probe.** Check whether this session has a tool that starts a fresh-context subagent; the harness appendices name it per harness.
 **Present:** the background-agent transport is available, and the compile runs as the one fresh-context dispatch Step boundary describes.
 **Absent:** the background-agent transport is unavailable, and the compile runs in this session.
-Units go to cezar when its probe is present, else to ringer when its probe is present; a unit that needs in-session tools or mid-flight continuation goes to herdr panes when that probe is present.
-When a unit is left with no transport, or ringer, herdr, and cezar are all absent, stop the automated drive and emit the human-paced run-book (Human-paced output mode) instead, so each unit still gets a fresh session.
+Units go to ringer when its probe is present; a unit that needs in-session tools or mid-flight continuation goes to herdr panes when that probe is present.
+When a unit is left with no transport, or ringer and herdr are both absent, stop the automated drive and emit the human-paced run-book (Human-paced output mode) instead, so each unit still gets a fresh session.
 **Disclose:** when absent, say in one line in the emitted plan's pre-flight "no fresh-context subagent tool in this session; the background-agent transport is off and the compile ran in this session."
 When ringer is absent too, this line replaces ringer's Disclose line, which would otherwise claim the background-agent transport is the one left.
 
@@ -76,9 +76,9 @@ When ringer is absent too, this line replaces ringer's Disclose line, which woul
 **Disclose:** say in one line "herdr not detected; dispatching workers through the harness's own background-agent transport."
 
 **Probe.** When `CEZ_TASK_ID` is set, run the cezar probe in `references/cezar-transport.md`.
-**Present:** every unit takes the cezar task transport, and no unit takes ringer or the background-agent transport in this run.
+**Present:** every unit of this run is owned by the chain's compile step; print the line the reference gives and stop.
 **Absent:** routing is unchanged.
-**Disclose:** when present, say in one line in the emitted plan's pre-flight "running inside a cezar task; every unit dispatches as a cezar child task."
+**Disclose:** when present, the stop line the reference gives is the disclosure.
 
 Apply the checkability gate here and per unit (P6: a unit belongs on a worker only if its output can be checked more cheaply than produced); anything that fails it stays in the orchestrator's own judgment lane, never dispatched.
 
@@ -122,7 +122,6 @@ Model choice is one chain for every unit, regardless of transport, and it follow
 Evidence cells carry the short tag only (`posterior`, `prior`, `pin:<reason-word>`); longer rationale goes in a footnote beneath the table; a pin outranks the chain when its trigger holds and the reason is never "seems hard".
 
 Transport is derived per unit, never chosen per wave: a unit that needs in-session tools or mid-flight continuation takes the background-agent transport; otherwise it takes ringer, subject to the ringer stub's Absent rule from Step 0.
-When Step 0's cezar probe is present, every unit takes the cezar task transport instead.
 Within a wave, all ringer-transport units pack into one manifest; background-agent units launch as parallel workers; both meet at the same gate.
 
 Roster: background-agent workers are sonnet, opus, and haiku; Fable is orchestrator-tier only and never a worker; GLM and codex run only via ringer.
@@ -130,6 +129,7 @@ Quota preference: execution typing leans to the flat-rate `claude-zai` lane when
 Taste flag: units with aesthetic acceptance criteria get flagged in the routing table and offered the per-unit engine ask despite any default.
 
 Give every unit a `task_type`; the field is free-form, and the suggested vocabulary's single home is ringer's README - never restate the list here.
+Each unit's task_type is the plan's Type: line; a Model: line on the task is a pin that wins over the routing chain; on ringer the type is the manifest's task_type.
 The task_type drives scoreboard routing and must be set even for background-agent units so the choice is legible.
 When ringer's optional Jev task_type feature is on, lint prints one `jev:` line per task comparing Jev's pick with the hand label; treat a disagreement as a re-check signal on the hand label, not an authority, and read a `keeps hand (hand-outside-vocabulary)` line as expected for a type outside Jev's narrower closed set, not actionable.
 
@@ -214,11 +214,9 @@ On exit 0, follow the loop-auto skill's "Dispatched sessions" section for every 
 
 Ringer-transport units: emit one manifest for the wave and run it (`./ringer.py lint <manifest> && ./ringer.py run <manifest>`), using the SAME `run_name` across all waves; ringer's built-in single retry IS the repair pass, you do not add one.
 Background-agent units: the harness runs them as parallel background workers and notifies you on each completion - on completion, launch that unit's validator; on a failed validation, one repair pass routed to the same implementer (the appendix names the steering mechanism), then revalidate; a second failure stops that unit without blocking its siblings.
-Cezar-transport units: dispatch, wait, merge, and repair exactly as `references/cezar-transport.md` says; its repair pass is the one repair the unit gets.
 
 **2. Gate (orchestrator).**
 Read all results and verdicts from both transports.
-Cezar-transport units: merge each finished child's branch into the integration branch and re-run the unit's acceptance check there; a child's own report is never the verdict.
 Ringer: consume the run JSON in `~/.ringer/runs/` and the raw worker logs in `<workdir>/logs/` per ringer's post-run ritual (read every retried/failed log, spot-check at least one passing artifact).
 The run JSON is truth; a detached/background shell's exit status is transport and can report failure for a run that passed.
 On a FAIL, attribute before relaunching, and attribution is always a fresh re-run of the check rather than a precedent substitution.
@@ -232,6 +230,7 @@ Write the wave summary; prune worker worktrees (ringer prunes its own).
 
 **3. Distill before advancing (both transports, P10: distill or repeat forever).**
 Turn any repeated failure pattern from this wave's verdicts into a fix in the spec artifact and the templates before the next wave, so the next wave does not re-earn the same failures.
+A finding that names a global constraint becomes a shared test: append a path= block under the plan's ## Shared tests section, commit it with the gate's commit, and every later unit's custody check includes it.
 Background-agent units MUST leave dated MODEL-NOTES receipts at the gate - their only durable receipt, since only ringer runs feed the scoreboard.
 Batch them: one dated line per (model, task_type) per wave in `<ringer-repo>/docs/MODEL-NOTES.md`, plus a separate line only for signal events (a pin, a runtime re-route, a check-bug attribution, an off-nominal result); support them only with validator verdicts and diffs, and read them back through the same integrity discipline as any posterior.
 Committing the ringer-repo receipt is part of closing the gate: commit it before advancing the wave, so the git-is-truth reconciliation covers both repos.
