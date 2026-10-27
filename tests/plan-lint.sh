@@ -40,4 +40,14 @@ head -n 1 "$TMP/table.md" | grep -q '^| Wave | Task *| Shape | Type *| Model | W
 [ "$(awk '{ print length($0) }' "$TMP/table.md" | sort -u | wc -l)" -eq 1 ] || fail "table rows are not aligned to one width"
 diff <(sed -n '/^## Run shape/,/^## /p' "$FX/good-plan.md" | grep '^|') "$TMP/table.md" >/dev/null || fail "run-table differs from the good plan's table"
 [ "$(python3 "$L" human-tasks "$FX/good-plan.md")" = 4 ] || fail "human-tasks wrong"
+# skill-local test folders: skills/<name>/tests/ is a test root, nothing else under skills/ is
+sed 's|tests/test_one.py|skills/craft-review/tests/test_x.py|g' "$FX/good-plan.md" > "$TMP/skill.md"
+python3 "$L" lint "$TMP/skill.md" > "$TMP/skill.out" 2>&1 || fail "a skills/<name>/tests/ block was refused by lint: $(cat "$TMP/skill.out")"
+python3 "$L" tests "$TMP/skill.md" --out "$TMP/sk-ok" > /dev/null || fail "a skills/<name>/tests/ block was not written"
+[ -f "$TMP/sk-ok/skills/craft-review/tests/test_x.py" ] || fail "skills/craft-review/tests/test_x.py missing after extraction"
+for bp in skills/craft-review/src/x.py skills/a/b/tests/x.py skills/tests/x.py; do
+  sed "s|tests/test_one.py|$bp|g" "$FX/good-plan.md" > "$TMP/skill-bad.md"
+  out="$(python3 "$L" tests "$TMP/skill-bad.md" --out "$TMP/sk-bad-$(echo "$bp" | tr / _)" 2>&1)"; rc=$?
+  [ "$rc" -eq 1 ] && echo "$out" | grep -q "^FAIL path $bp " || fail "$bp was not refused: rc=$rc $out"
+done
 echo "PASS: plan lint"

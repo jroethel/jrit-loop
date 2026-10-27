@@ -50,6 +50,7 @@ PLACEHOLDERS = ("TBD", "TODO", "implement later", "fill in details",
                 "Similar to Task")
 TEST_FENCE_RE = re.compile(r"^(`{3,}|~{3,})\S*\s+.*\bpath=(\S+)")
 TEST_ROOTS = ("tests/", "test/", "spec/")
+SKILL_TEST_RE = re.compile(r"^skills/[a-z0-9][a-z0-9-]*/tests/")
 AUTO_WHY = "executed check, disjoint files"
 
 
@@ -357,8 +358,8 @@ def bad_path(p):
     """Why a test block path may not be written, or None."""
     if os.path.isabs(p) or ".." in p.split("/"):
         return "escapes the repo"
-    if not p.startswith(TEST_ROOTS):
-        return "is outside tests/, test/, spec/"
+    if not (p.startswith(TEST_ROOTS) or SKILL_TEST_RE.match(p)):
+        return "is outside tests/, test/, spec/, skills/<name>/tests/"
     return None
 
 

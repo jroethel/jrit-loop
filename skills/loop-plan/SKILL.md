@@ -263,7 +263,7 @@ After Step 1, every task carries the same remaining steps: run the test with the
 
 **Test blocks.**
 A test block opens its fence with `path=<repo-relative path>` in the info string, plus an optional `mode=append` or `mode=replace`.
-The path sits under `tests/`, `test/`, or `spec/`; a block without a mode writes a new file, `mode=append` adds a fragment to an existing one, and only `mode=replace` may replace a tracked file.
+The path sits under `tests/`, `test/`, `spec/`, or `skills/<name>/tests/`; a block without a mode writes a new file, `mode=append` adds a fragment to an existing one, and only `mode=replace` may replace a tracked file.
 Every `Test:` bullet and every `## Shared tests` entry has exactly one tagged block.
 
 **Code policy.**
