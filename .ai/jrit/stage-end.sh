@@ -81,7 +81,7 @@ local_ci() {
 }
 
 merge_card() {
-  local base B RB brief N plan ids id mb rv p blocks found moved sha
+  local base B RB brief N plan ids id mb rv p blocks found moved sha changed n line rest count
   clean_tree
   base=$(need_state jrit-chain-base); B=${base#origin/}
   RB=$(git branch --show-current)
@@ -132,6 +132,19 @@ merge_card() {
     fi
   done < <(git diff --name-only --diff-filter=A "$mb" HEAD -- "$rv")
   [ -n "$found" ] || echo "none recorded"
+
+  echo "Defaults taken on this branch (confirm once by approving):"
+  changed=()
+  while IFS= read -r p; do changed+=("$p"); done < <(git -c core.quotePath=false diff --name-only "$mb" HEAD)
+  count=0
+  if [ "${#changed[@]}" -gt 0 ]; then
+    while IFS= read -r -d '' rest && IFS= read -r -d '' n && IFS= read -r line; do
+      count=$((count + 1))
+      [ "$count" -le 40 ] || continue
+      echo "- ${rest#HEAD:}:$n: $(printf '%s' "$line" | python3 -I -c 'import sys; sys.stdout.buffer.write(sys.stdin.buffer.read().decode("utf-8", "replace")[:160].encode("utf-8"))')"
+    done < <(git -c core.quotePath=false grep -nIz 'NEEDS HUMAN CONFIRMATION' HEAD -- "${changed[@]/#/:(literal)}" ':!.ai' ':!docs/loop' 2>/dev/null)
+  fi
+  if [ "$count" -eq 0 ]; then echo "none"; elif [ "$count" -gt 40 ]; then echo "($((count - 40)) more; read the plan)"; fi
 
   echo "Approve squash-merges and pushes. Reject ends the run failed and keeps branch $RB."
 }

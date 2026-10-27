@@ -5,6 +5,7 @@ set -uo pipefail
 TOOL=".ai/jrit/plan_tool.py"
 
 fail() { echo "stage gate: $1"; exit 1; }
+. ./.ai/jrit/kit-lib.sh || fail "cannot load .ai/jrit/kit-lib.sh; restamp the chain kit"
 
 # RV5: a passing gate moves the durable branch to the run head.
 durable_branch() {
@@ -40,8 +41,13 @@ plan)
 drive)
     find_plan
     python3 "$TOOL" check "$plan" --base "$CEZ_BASE" || exit 1
-    python3 "$TOOL" ownership "$plan" --base "$CEZ_BASE" || exit 1
     python3 "$TOOL" run-checks "$plan" || exit 1
+    # D28: once stage-tests.sh has run, no committed test and not the plan may change.
+    issue="$(git rev-parse --git-path jrit-chain-issue)"
+    if [ -f "$issue" ] && git rev-parse -q --verify "refs/jrit/I$(cat "$issue")/tests" >/dev/null; then
+        bash .ai/jrit/unit-gate.sh custody || exit 1
+    fi
+    python3 "$TOOL" ownership "$plan" --base "$CEZ_BASE" || exit 1
     ;;
 ownership)
     find_plan

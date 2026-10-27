@@ -1,4 +1,5 @@
 # Shared kit helpers, sourced as .ai/jrit/kit-lib.sh from the run worktree.
+export TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1
 
 # kit_diff <base ref>: one path per line for every file under .ai/jrit/ in HEAD or the base,
 # plus the chain graph, whose blob differs between HEAD and the base (absent on one side

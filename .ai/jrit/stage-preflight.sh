@@ -13,13 +13,15 @@ done
 url="$CEZ_API_URL/api/v1/p/$CEZ_PROJECT_ID/runs/$CEZ_RUN_ID"
 rec="$(curl -sf "$url")" || die "cannot read run $CEZ_RUN_ID from $url"
 
-# 2. task text: <brief> [--from plan|drive|review] [--branch <branch>]
-USAGE='<brief> [--from plan|drive|review] [--branch <branch>]'
+# 2. task text: <brief> [--from plan|drive|review|unit=<k>] [--to plan] [--branch <branch>] [--chain <run id>]
+USAGE='<brief> [--from plan|drive|review|unit=<k>] [--to plan] [--branch <branch>] [--chain <run id>]'
 read -r -a words <<< "$(printf '%s' "$rec" | jq -r '.task // ""')"
 [ "${#words[@]}" -gt 0 ] || die "no brief in the task text; task text is: $USAGE"
 brief="${words[0]}"
 from=""
+to=""
 old=""
+chain=""
 i=1
 while [ "$i" -lt "${#words[@]}" ]; do
   w="${words[$i]}"
@@ -28,6 +30,16 @@ while [ "$i" -lt "${#words[@]}" ]; do
       nv="${words[$((i + 1))]:-}"
       case "$nv" in
         plan|drive|review) from="$nv"; i=$((i + 2)) ;;
+        unit=*)
+          [[ "${nv#unit=}" =~ ^[1-9][0-9]*$ ]] || die "unknown argument $nv; task text is: $USAGE"
+          from="$nv"; i=$((i + 2)) ;;
+        *) die "unknown argument ${nv:-$w}; task text is: $USAGE" ;;
+      esac
+      ;;
+    --to)
+      nv="${words[$((i + 1))]:-}"
+      case "$nv" in
+        plan) to="$nv"; i=$((i + 2)) ;;
         *) die "unknown argument ${nv:-$w}; task text is: $USAGE" ;;
       esac
       ;;
@@ -35,11 +47,18 @@ while [ "$i" -lt "${#words[@]}" ]; do
       nv="${words[$((i + 1))]:-}"
       if [ -n "$nv" ]; then old="$nv"; i=$((i + 2)); else die "unknown argument $w; task text is: $USAGE"; fi
       ;;
+    --chain)
+      nv="${words[$((i + 1))]:-}"
+      if [ -n "$nv" ]; then chain="$nv"; i=$((i + 2)); else die "unknown argument $w; task text is: $USAGE"; fi
+      ;;
     *)
       die "unknown argument $w; task text is: $USAGE"
       ;;
   esac
 done
+if [ "$to" = plan ] && [ -n "$from" ] && [ "$from" != plan ]; then
+  die "--to plan needs --from plan or no --from"
+fi
 
 # 3. the brief is committed on the base branch
 git cat-file -e "HEAD:$brief" 2>/dev/null \
@@ -109,14 +128,35 @@ if [ -n "$bad" ]; then
   exit 1
 fi
 
-# 11. a restart at drive or review needs a committed, passing plan
+# 11. a restart at drive, review, or a unit needs a committed, passing plan
 plan=""
-if [ "$from" = drive ] || [ "$from" = review ]; then
+if [ -n "$from" ] && [ "$from" != plan ]; then
   plan="$(python3 .ai/jrit/plan_tool.py find-plan)" \
     || die "--from $from needs a committed plan on this branch; pass --branch <the branch that holds it>"
   python3 .ai/jrit/plan_tool.py check "$plan" >/dev/null 2>&1 \
     || die "--from $from needs a committed plan on this branch; pass --branch <the branch that holds it>"
 fi
+# a unit restart belongs to a generated drive run; on jrit-chain it would fall through to plan
+if [[ "$from" == unit=* ]] && [ "$(printf '%s' "$rec" | jq -r '.workflow // ""')" = jrit-chain ]; then
+  die "--from $from is for a generated drive run, not jrit-chain; restart the drive run, or use --from drive"
+fi
+# a unit past the first needs the tests commit, kept in a ref every worktree shares (D23)
+case "$from" in
+  unit=1) ;;
+  unit=*)
+    tests="$(git rev-parse -q --verify "refs/jrit/I$issue/tests^{commit}")" \
+      && git merge-base --is-ancestor "$tests" HEAD \
+      || die "--from $from needs the tests commit; restart at unit=1"
+    ;;
+esac
+# the route: --from drive on a generated drive workflow is its first unit
+route="${from:-plan}"
+if [ "$from" = drive ]; then
+  case "$(printf '%s' "$rec" | jq -r '.workflow // ""')" in
+    jrit-drive.*) route="unit=1" ;;
+  esac
+fi
+case "$route" in unit=*) route="$route;" ;; esac
 
 # 12. durable branch
 git branch -f "jrit/chain-I$issue" HEAD
@@ -129,5 +169,7 @@ echo "Branch: $branch"
 echo "Durable branch: jrit/chain-I$issue"
 [ -n "$merged" ] && echo "Merged: $old ($merged)"
 [ -n "$plan" ] && echo "Plan: $plan"
-echo "Route: ${from:-plan}"
+[ -n "$to" ] && echo "To: $to"
+[ -n "$chain" ] && echo "Chain: $chain"
+echo "Route: $route"
 exit 0

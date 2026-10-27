@@ -27,3 +27,4 @@ automation-poll.lock
 automation-poll.lock.guard/
 automation-mutation.lock.guard/
 automation-mutation.lock
+workflows/jrit-drive.*.yaml
