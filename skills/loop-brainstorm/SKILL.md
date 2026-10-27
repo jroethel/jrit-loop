@@ -171,6 +171,7 @@ sub-agent to find it instead of asking.
 Don't block on it: a running exploration is an unsettled prerequisite, so only the questions
 downstream of it wait - ask the rest of the frontier now.
 The decisions are the user's; put each to them and wait.
+Each answered question lands in the brief's Resolved assumptions section as an A<n> line, so the plan stage never asks it again.
 
 The frontier stays capped at brief-shaped questions.
 Questions you do NOT ask here: architecture, components, schedulers, data flow, file formats,

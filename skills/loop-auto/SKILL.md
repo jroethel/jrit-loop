@@ -50,6 +50,8 @@ On `set auto` the session first presents one consolidated ASK - `outstanding bef
 - DEFAULT auto-takes the default and logs verbosely.
   The default was already declared at the gate; autonomy takes it, logs the decision in full, and moves on.
 
+Every BATCH lean and DEFAULT take is written where it applies (the plan, the handoff, or the journal) as a line carrying the literal marker NEEDS HUMAN CONFIRMATION, and the merge card lists every such line on the branch for one confirmation.
+
 Scope narrowing is ASK-class by definition: a decision that narrows the requested scope is never a BATCH lean or a DEFAULT take, wherever inside a step it arises.
 Narrowing is sometimes right, but it is never silent and never auto-taken - it surfaces as its own explicit question.
 

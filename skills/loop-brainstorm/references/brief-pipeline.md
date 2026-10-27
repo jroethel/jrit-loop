@@ -41,11 +41,16 @@ Scale each to the idea - one sentence is fine for a simple one - and use your ju
 | Seams                      | Independently checkable pieces in blast-radius order, or "atomic" stated    |
 | Known vs guessed           | Three bins: verified / believed-unchecked / guessed, with what breaks if a  |
 |                            | guess is wrong                                                              |
+| Resolved assumptions       | REQUIRED. Each settled or taken assumption as one A<n> line (see below)     |
 | Parking lot                | Every parked thread, verbatim enough to restart later                       |
 | North star and invariants  | The maximal end state in 2-3 sentences, then each decision v1 must get      |
 |                            | right and the parked future that depends on it                              |
 | Out of scope               | What this deliberately is not                                               |
 | Open questions for planning| Implementation questions that surfaced, one line each, unanswered           |
+
+**Resolved assumptions contract.**
+The `Resolved assumptions` section is REQUIRED, and its contract line reads:
+`Every assumption the interview settled or the author took, one bullet each, as A<n>: <assumption> - taken as <reading>; flips if <what>; the plan stage reads this section before its one question card and never re-asks an A<n>.`
 
 **Checkability tagging rule.**
 Tag a criterion `[executed-check]` only if you can name the command shape that would verify it (exit 0, a rendered file, a fetched citation).
