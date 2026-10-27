@@ -63,9 +63,14 @@ trap cleanup EXIT
 # --- setup, part 1: sweep stale scratch repos left by earlier failed runs ------
 # First action, before creating anything: a run that crashed yesterday must not
 # accumulate repos forever. Delete targets are only jrit-loop-scratch-* under
-# jroethel, never anything else.
+# jroethel, never anything else. Only repos whose name epoch is at least an hour
+# old are swept: a concurrent run's repo is young and must survive, and a name
+# with a non-numeric epoch is not ours to judge.
 gh repo list jroethel --limit 200 --json name -q '.[].name' 2>/dev/null \
   | grep '^jrit-loop-scratch-' | while read -r stale; do
+    stale_epoch="${stale#jrit-loop-scratch-}"; stale_epoch="${stale_epoch%%-*}"
+    case "$stale_epoch" in ''|*[!0-9]*) continue ;; esac
+    [ $(( $(date +%s) - stale_epoch )) -ge 3600 ] || continue
     echo "sweep: deleting stale scratch repo jroethel/$stale left by an earlier run"
     gh repo delete "jroethel/$stale" --yes || true
   done
