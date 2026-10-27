@@ -42,7 +42,8 @@ trap 'rm -f "$copy"' EXIT
 git show "$TESTS:$plan" >"$copy" 2>/dev/null || fail "$plan is not in the tests commit $(git rev-parse "$TESTS" | cut -c1-12)"
 
 # q tests|shared: the plan copy's Test: and shared test paths, or only the
-# shared ones; q owner <id> <prev>: every path changed since <prev> that is
+# shared ones; q later <id>: the Test: paths of the units after <id> in run
+# order, less any of <id>, of a unit before it, or shared; q owner <id> <prev>: every path changed since <prev> that is
 # outside the unit's Files bullets and the plan, review, and handoff homes.
 q() {
     python3 - "$@" "$copy" <<'PY'
@@ -50,7 +51,7 @@ import sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, ".ai/jrit")
 import plan_tool as t
-from plan_lint import analyze, blocks, files_of, section, SHARED_RE
+from plan_lint import analyze, blocks, files_of, run_order, section, SHARED_RE
 
 what, plan = sys.argv[1], sys.argv[-1]
 lines, inside, tasks = analyze(t.read_file(plan))
@@ -64,6 +65,16 @@ elif what == "tests":
     for p in dict.fromkeys([p for task in tasks
                             for p in files_of(task)["test"]] + shared):
         print(p)
+elif what == "later":
+    order = run_order(tasks)
+    at = next((i for i, x in enumerate(order) if x["id"] == sys.argv[2]), None)
+    if at is None:
+        print("no Task {}".format(sys.argv[2]))
+        sys.exit(2)
+    keep = {p for x in order[:at + 1] for p in files_of(x)["test"]} | set(shared)
+    for p in dict.fromkeys(p for x in order[at + 1:] for p in files_of(x)["test"]):
+        if p not in keep:
+            print(p)
 else:
     tid, prev = sys.argv[2], sys.argv[3]
     task = next((x for x in tasks if x["id"] == tid), None)
@@ -125,7 +136,28 @@ CI_COMMAND=""
 if [ -z "${CI_COMMAND:-}" ]; then
     echo "note: CI_COMMAND is empty in .ai/jrit/kit.conf; no full suite run"
 else
-    out="$(bash -c "$CI_COMMAND" 2>&1)" || {
+    # Later units' committed tests are red until they land: run the suite in
+    # a throwaway worktree of HEAD with each one reset to the tests commit's
+    # parent, or removed when it is new there.
+    later="$(q later "$id")" || fail "$later"
+    run="."
+    if [ -n "$later" ]; then
+        echo "full suite: holding back $(printf '%s\n' "$later" | wc -l | tr -d ' ') later test(s)"
+        run="$(mktemp -d)" || exit 1
+        trap 'rm -f "$copy"; git worktree remove --force "$run" >/dev/null 2>&1; rm -rf "$run"' EXIT
+        trap 'exit 1' HUP INT TERM
+        git worktree add -q --detach "$run" HEAD || fail "cannot add a throwaway worktree"
+        for p in $later; do
+            if git cat-file -e "$TESTS^:$p" 2>/dev/null; then
+                git -C "$run" checkout -q "$TESTS^" -- "$p"
+            else
+                git -C "$run" rm -q -f --ignore-unmatch -- "$p"
+            fi || fail "cannot hold back $p"
+        done
+        git -C "$run" -c user.name=unit-gate -c user.email=unit-gate@localhost -c commit.gpgsign=false \
+            commit -q --no-verify --allow-empty -m "unit gate: held back" || fail "cannot commit the held-back tree"
+    fi
+    out="$(cd "$run" && bash -c "$CI_COMMAND" 2>&1)" || {
         echo "unit gate: full suite failed ($CI_COMMAND)"
         printf '%s\n' "$out" | tail -n 150
         exit 1
