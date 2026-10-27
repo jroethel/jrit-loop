@@ -5,4 +5,4 @@ The plan is at `repo/docs/plan.md` and has passed self-review. Because the point
 - **Left to a person:** whether the glossary "reads cleanly to a newcomer" can't be checked by a script, so the plan ends with a human reading step for it.
 - **One fix during self-review:** I reworded the suggested Plan and Unit definitions so they don't mention each other's terms. The brief rules out cross-references.
 
-Plan written. Want the Rubix review? The rubix-review skill sends fresh-context reviewers - one reads it as a professional downstream of the artifact, one gives it a cold best-practice read. Findings with rationale, you pick what gets in.
+Skeleton written. Want the Rubix review? The rubix-review skill sends fresh-context reviewers - one reads it as a professional downstream of the artifact, one gives it a cold best-practice read. Findings with rationale, you pick what gets in.

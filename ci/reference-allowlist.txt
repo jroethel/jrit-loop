@@ -22,3 +22,4 @@ CONTRIBUTING.md # why: illustrative example of a standards source in the repo un
 .claude/CLAUDE.md # why: target-repo instructions file loop-setup writes the @../AGENTS.md import into when the repo root is a plugin root, named in prose, not a skill-shipped file (added by issue #27)
 .claude-plugin/plugin.json # why: target-repo plugin manifest loop-setup checks for to detect a plugin root, named in prose, not a skill-shipped file (added by issue #27)
 whats_next.md # why: illustrative example of a living resume doc in the target repo, named in loop-setup's import-triage prose, not a skill-shipped file
+chain-start.sh # why: jrit-core's chain launcher, named in loop-plan's exit prose under a probe, not a skill-shipped file

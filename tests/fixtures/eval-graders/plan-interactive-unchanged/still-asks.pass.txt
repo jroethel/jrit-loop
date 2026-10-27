@@ -1,0 +1,28 @@
+# Greeting Script Implementation Plan
+
+**Goal:** the repository gains hello.sh, which prints one greeting line and exits 0.
+
+## Decision log
+
+| ID | Decision                 | Source  |
+| -- | ------------------------ | ------- |
+| D1 | English greeting only    | default |
+
+## Tasks
+
+### Task 1: hello.sh
+
+Depends on: none
+Shape: auto
+Type: code-feature
+Decisions: D1
+
+**Files (exclusive ownership):**
+- Create: `hello.sh`
+- Test: `tests/hello.sh`
+
+**Interfaces:** `bash hello.sh` prints one line and exits 0.
+
+**Edge inputs:** none (the script takes no input)
+
+**Acceptance check:** `bash tests/hello.sh` exits 0 `[executed-check]`

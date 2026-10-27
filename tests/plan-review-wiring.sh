@@ -9,7 +9,7 @@ fail() { echo "FAIL: $1" >&2; exit 1; }
 cd "$(dirname "${BASH_SOURCE[0]}")/.." || fail "cannot reach the repo root"
 
 P=skills/loop-plan/SKILL.md
-grep -qxF '## Step 3 - The plan review (optional)`[gate:ASK]`' "$P" || fail "$P lacks the Step 3 plan review heading with its ASK gate tag"
+grep -qxF '## Step 4 - The plan review (optional)`[gate:ASK]`' "$P" || fail "$P lacks the Step 4 plan review heading with its ASK gate tag"
 for s in 'Read `plan-review` from `docs/loop/pointer.md` (default `ask` when the key is absent).' \
          'references/plan-review.md' 'references/plan-review-template.html' \
          '**Plan review:** path of the plan review record' \
@@ -18,10 +18,10 @@ for s in 'Read `plan-review` from `docs/loop/pointer.md` (default `ask` when the
 done
 for n in 4 5 6 7 8 9; do grep -qE "^## Step $n - " "$P" || fail "$P has no Step $n heading after the renumbering"; done
 [ "$(grep -c '^## Step ' "$P")" = 9 ] || fail "$P should carry exactly nine Step headings"
-grep -qF 'Decline means proceed to Step 4' "$P" || fail "$P: the plan review decline must route to Step 4"
-grep -qF 'Decline means proceed to Step 8' "$P" || fail "$P: the Rubix decline must route to Step 8"
+grep -qF 'Decline means proceed to Step 5' "$P" || fail "$P: the plan review decline must route to Step 5"
+grep -qF 'Decline means proceed to Step 3' "$P" || fail "$P: the Rubix decline must route to Step 3"
 grep -qF 'Want the Rubix review?' "$P" || fail "$P lost the pinned Rubix offer sentence that evals/rubix-present-offer/graders/one-rubix-offer.md counts"
-grep -qF 'offer the review once, as its own message, after self-review passes, in exactly these words:' "$P" || fail "$P lost the word-for-word pin on the Rubix offer"
+grep -qF 'offer the review once, as its own message, after the skeleton is written, in exactly these words:' "$P" || fail "$P lost the word-for-word pin on the Rubix offer"
 
 for f in skills/loop-plan/references/plan-review.md skills/loop-plan/references/plan-review-template.html; do
   [ -f "$f" ] || fail "$f is missing"
@@ -41,9 +41,9 @@ grep -qxF 'plan-review: <ask|off|on>' skills/loop-setup/references/pointer-templ
 grep -qF 'plan-review-brand: <slug>' skills/loop-setup/references/pointer-templates.md || fail "pointer template does not document plan-review-brand"
 grep -qxF 'plan-review: ask' docs/loop/pointer.md || fail "this repo's pointer lacks plan-review: ask"
 
-grep -qF 'loop-plan Step 7:' skills/loop-brainstorm/SKILL.md || fail "loop-brainstorm still points at the old Rubix step number"
-grep -qF 'loop-plan, Steps 4-6' skills/loop-drive/references/model-benchmarks.md || fail "model-benchmarks still pins plan-draft to the old step numbers"
-grep -qF 'Step 7 takes its present branch' evals/rubix-present-offer/prompt.md || fail "rubix-present-offer still names the old Rubix step number"
+grep -qF 'loop-plan Step 2:' skills/loop-brainstorm/SKILL.md || fail "loop-brainstorm still points at the old Rubix step number"
+grep -qF 'loop-plan, Steps 5-6' skills/loop-drive/references/model-benchmarks.md || fail "model-benchmarks still pins plan-draft to the old step numbers"
+grep -qF 'Step 2 takes its present branch' evals/rubix-present-offer/prompt.md || fail "rubix-present-offer still names the old Rubix step number"
 for c in rubix-present-offer rubix-absent-callout; do
   grep -qF 'plan-review: off' "evals/$c/prompt.md" || fail "evals/$c does not turn the plan review off, so its Rubix offer is no longer the only offer"
 done

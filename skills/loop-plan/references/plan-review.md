@@ -54,7 +54,7 @@ notes: <free text, may be empty>
 ```
 
 A `changes` verdict with notes means a new review round: fold the notes into the record, rebuild the page, bump `round`, and ask again.
-An `approved` verdict means append the block and the verdict to the record, then continue to the decompose step; the record's path goes into the plan header's `**Plan review:**` line, and the plan's decisions cite the record's IDs.
+An `approved` verdict means append the block and the verdict to the record, then continue to Step 5 - Write the task bodies and tests; the record's path goes into the plan header's `**Plan review:**` line, and the plan's decisions cite the record's IDs.
 
 ## The renderer
 

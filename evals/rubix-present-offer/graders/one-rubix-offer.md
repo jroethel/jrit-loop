@@ -1,6 +1,6 @@
 ---
 type: regex
 target: last_message
-pattern: "Want the Rubix review\\?"
+pattern: "Skeleton written\\. Want the Rubix review\\?"
 match: "count:1"
 ---

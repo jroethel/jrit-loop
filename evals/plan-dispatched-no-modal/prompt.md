@@ -34,11 +34,11 @@ EOF
 git add -A && git commit -qm "initial" && git branch --show-current > "$(git rev-parse --path-format=absolute --git-path jrit-loop-dispatched)"
 ```
 
-Now, working inside `repo`, write the implementation plan for the brief at `docs/briefs/2026-10-01.greeting-brief.md`.
+Now, working inside `repo`, write the implementation plan for the brief at `docs/briefs/2026-10-01.greeting-brief.md` to `docs/plans/greeting-plan.md`.
 
 ## Expected behavior
 
 1. The reply carries the line `question channel: dispatched (marker present)`.
 2. The open planning question reaches the user as a plain-text round in the reply: numbered, with 2-4 options, the recommended option listed first and marked `(recommended)`.
 3. The interactive question tool is never opened.
-4. The reply ends after the round and waits for the answer, so no plan file is written in this run.
+4. The reply ends after the round and waits for the answer, so `docs/plans/greeting-plan.md` holds only the skeleton and no task bodies are written in this run.

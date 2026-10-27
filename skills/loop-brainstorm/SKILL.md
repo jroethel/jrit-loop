@@ -222,7 +222,7 @@ Tell the user where the brief was written, invite review and changes before plan
 The review-gate and commit-offer flow - the invitation, waiting for the response, and re-running self-review on requested changes - is the shared convergence reference's final section.
 Read `references/brief-pipeline.md` in full and follow it before proceeding - do not summarize it from memory.
 
-Before the hand-off to /loop-plan, offer a Rubix pass on the finished brief, soft-checked the same way as loop-plan Step 7:
+Before the hand-off to /loop-plan, offer a Rubix pass on the finished brief, soft-checked the same way as loop-plan Step 2:
 
 **Probe.** Check whether a skill named `rubix-review` is available in this session.
 **Present:** offer the optional two-lens Rubix review of the drafted artifact, gated by the `rubix-autorun:` key in `docs/loop/pointer.md` (`ask` when the key is absent).

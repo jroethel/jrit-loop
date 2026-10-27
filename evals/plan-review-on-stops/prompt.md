@@ -40,10 +40,10 @@ EOF2
 git add -A && git commit -qm "initial"
 ```
 
-Now, working inside `repo`, write the implementation plan for the brief at `docs/briefs/2026-10-17.greeting-brief.md`.
+Now, working inside `repo`, write the implementation plan for the brief at `docs/briefs/2026-10-17.greeting-brief.md` to `docs/plans/greeting-plan.md`.
 
 ## Expected behavior
 
-1. Because `plan-review: on` is set, a plan review record is written at `docs/reviews/2026-10-17.greeting-plan-review.md` and a page at `docs/reviews/2026-10-17.greeting-plan-review.html` before any plan is drafted.
+1. Because `plan-review: on` is set, a plan review record is written at `docs/reviews/2026-10-17.greeting-plan-review.md` and a page at `docs/reviews/2026-10-17.greeting-plan-review.html` before any task body is written.
 2. The record holds the parking-lot item with what it waits on, and a decision log with at least one ID.
-3. The reply names the page's path and asks for the verdict on the shape, then waits for the answer, so no plan file is written under `docs/plans/` in this run.
+3. The reply names the page's path and asks for the verdict on the shape, then waits for the answer, so `docs/plans/greeting-plan.md` holds only the skeleton and no task bodies are written in this run.

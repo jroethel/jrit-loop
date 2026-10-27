@@ -34,9 +34,10 @@ EOF
 git add -A && git commit -qm "initial"
 ```
 
-Now, working inside `repo`, write the implementation plan for the brief at `docs/briefs/2026-10-01.greeting-brief.md`.
+Now, working inside `repo`, write the implementation plan for the brief at `docs/briefs/2026-10-01.greeting-brief.md` to `docs/plans/greeting-plan.md`.
 
 ## Expected behavior
 
 1. The reply carries no `question channel:` line, because the interactive path prints nothing about the test.
 2. The open planning question is put to the user through the interactive question tool.
+3. The question comes after the skeleton is written to `docs/plans/greeting-plan.md` and before any task body, so no task bodies are written in this run.
