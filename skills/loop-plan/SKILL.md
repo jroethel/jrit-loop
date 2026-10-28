@@ -155,7 +155,7 @@ The section contract for both, the answer block, and the renderer choice live in
 Read `plan-review` from `docs/loop/pointer.md` (default `ask` when the key is absent).
 
 - `ask` - after the question round, offer the review once, as its own message:
-  > "Questions settled. Want the plan review page before the plan draft? One page: where the changes land, the flow with one figure per load-bearing decision, the open decisions, what the shape assumes, the parking lot, and what happens next. You approve the shape, then the plan gets written."
+  > "Questions settled. Want the plan review page before the task bodies? One page: where the changes land, the flow with one figure per load-bearing decision, the open decisions, what the shape assumes, the parking lot, and what happens next. You approve the shape, then the task bodies get written."
   Decline means proceed to Step 5; do not offer again.
 - `on` - build the page without asking.
 - `off` - skip silently; proceed to Step 5.
