@@ -82,7 +82,7 @@ local_ci() {
 }
 
 merge_card() {
-  local base B RB brief N plan ids id mb rv p blocks found moved sha changed n line rest count
+  local base B RB brief N plan ids id mb rv p blocks found moved sha line count
   clean_tree
   base=$(need_state jrit-chain-base); B=${base#origin/}
   RB=$(git branch --show-current)
@@ -135,16 +135,28 @@ merge_card() {
   [ -n "$found" ] || echo "none recorded"
 
   echo "Defaults taken on this branch (confirm once by approving):"
-  changed=()
-  while IFS= read -r p; do changed+=("$p"); done < <(git -c core.quotePath=false diff --name-only "$mb" HEAD)
   count=0
-  if [ "${#changed[@]}" -gt 0 ]; then
-    while IFS= read -r -d '' rest && IFS= read -r -d '' n && IFS= read -r line; do
-      count=$((count + 1))
-      [ "$count" -le 40 ] || continue
-      echo "- ${rest#HEAD:}:$n: $(printf '%s' "$line" | python3 -I -c 'import sys; sys.stdout.buffer.write(sys.stdin.buffer.read().decode("utf-8", "replace")[:160].encode("utf-8"))')"
-    done < <(git -c core.quotePath=false grep -nIz 'NEEDS HUMAN CONFIRMATION' HEAD -- "${changed[@]/#/:(literal)}" ':!.ai' ':!docs/loop' 2>/dev/null)
-  fi
+  while IFS= read -r line; do
+    count=$((count + 1))
+    [ "$count" -le 40 ] || continue
+    printf '%s\n' "$line"
+  done < <(git -c core.quotePath=false diff -U0 --no-ext-diff -M "$mb" HEAD -- . ':!.ai' ':!docs/loop' | python3 -I -c '
+import sys
+marker = "NEEDS " + "HUMAN CONFIRMATION"
+path, hunk, n = None, False, 0
+for raw in sys.stdin.buffer:
+    line = raw.decode("utf-8", "replace").rstrip("\n")
+    if line.startswith("diff --git "):
+        path, hunk = None, False
+    elif not hunk and line.startswith("+++ "):
+        path = None if line == "+++ /dev/null" else line[6:].rstrip("\t")
+    elif line.startswith("@@ "):
+        n, hunk = int(line.split(" ")[2][1:].split(",")[0]), True
+    elif hunk and line.startswith("+"):
+        if path and marker in line:
+            print("- %s:%d: %s" % (path, n, line[1:][:160]))
+        n += 1
+')
   if [ "$count" -eq 0 ]; then echo "none"; elif [ "$count" -gt 40 ]; then echo "($((count - 40)) more; read the plan)"; fi
 
   echo "Approve squash-merges and pushes. Reject ends the run failed and keeps branch $RB."

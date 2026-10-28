@@ -99,8 +99,10 @@ PY
 }
 
 custody() {
-    paths="$(q tests)" || exit 1
-    changed="$(git diff --name-only "$TESTS" -- "$plan" $paths)" || exit 1
+    out="$(q tests)" || exit 1
+    specs=(":(literal)$plan")
+    while IFS= read -r p; do [ -n "$p" ] && specs+=(":(literal)$p"); done <<<"$out"
+    changed="$(git -c core.quotePath=false diff --name-only "$TESTS" -- "${specs[@]}")" || exit 1
     [ -z "$changed" ] && return 0
     printf '%s\n' "$changed" | sed 's/.*/custody: & differs from the tests commit/'
     exit 1
@@ -122,7 +124,10 @@ prev="$UNIT_HEAD"
 git rev-parse -q --verify "$prev" >/dev/null || prev="$TESTS"
 q owner "$id" "$prev" || exit 1
 # (4) shared tests, run directly
-for p in $(q shared); do
+out="$(q shared)" || exit 1
+shared=()
+while IFS= read -r p; do [ -n "$p" ] && shared+=("$p"); done <<<"$out"
+for p in ${shared[@]+"${shared[@]}"}; do
     case "$p" in *.py) run=python3 ;; *) run=bash ;; esac
     out="$("$run" "$p" 2>&1)" || {
         echo "shared test failed: $p"
@@ -139,19 +144,21 @@ else
     # Later units' committed tests are red until they land: run the suite in
     # a throwaway worktree of HEAD with each one reset to the tests commit's
     # parent, or removed when it is new there.
-    later="$(q later "$id")" || fail "$later"
+    out="$(q later "$id")" || fail "$out"
+    later=()
+    while IFS= read -r p; do [ -n "$p" ] && later+=("$p"); done <<<"$out"
     run="."
-    if [ -n "$later" ]; then
-        echo "full suite: holding back $(printf '%s\n' "$later" | wc -l | tr -d ' ') later test(s)"
+    if [ "${#later[@]}" -gt 0 ]; then
+        echo "full suite: holding back ${#later[@]} later test(s)"
         run="$(mktemp -d)" || exit 1
         trap 'rm -f "$copy"; git worktree remove --force "$run" >/dev/null 2>&1; rm -rf "$run"' EXIT
         trap 'exit 1' HUP INT TERM
         git worktree add -q --detach "$run" HEAD || fail "cannot add a throwaway worktree"
-        for p in $later; do
+        for p in "${later[@]}"; do
             if git cat-file -e "$TESTS^:$p" 2>/dev/null; then
-                git -C "$run" checkout -q "$TESTS^" -- "$p"
+                git -C "$run" checkout -q "$TESTS^" -- ":(literal)$p"
             else
-                git -C "$run" rm -q -f --ignore-unmatch -- "$p"
+                git -C "$run" rm -q -f --ignore-unmatch -- ":(literal)$p"
             fi || fail "cannot hold back $p"
         done
         git -C "$run" -c user.name=unit-gate -c user.email=unit-gate@localhost -c commit.gpgsign=false \

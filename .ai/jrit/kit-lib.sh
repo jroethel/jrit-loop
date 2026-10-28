@@ -1,4 +1,5 @@
 # Shared kit helpers, sourced as .ai/jrit/kit-lib.sh from the run worktree.
+# TMPDIR=/tmp: Cezar's task temp directory sits inside the outer checkout (research review 02, finding T1).
 export TMPDIR=/tmp PYTHONDONTWRITEBYTECODE=1
 
 # kit_diff <base ref>: one path per line for every file under .ai/jrit/ in HEAD or the base,

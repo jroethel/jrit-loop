@@ -185,7 +185,7 @@ def compile_plan(plan, issue, chain, template, routing):
             g.edge(u + "human.reject", "ping-unit-failed")
             continue
         model = t["model"] or route.get(t["type"], route["default"])
-        other = "sonnet" if model == "opus" else "opus"
+        other = "opus" if model == "sonnet" else "sonnet"
         ids = ", ".join(t["decisions"]) or "none"
         g.agent(u + "implement", "Unit %d implement: %s" % (k, t["title"]), model, STAGE_TOOLS, [
             "Implement Task {} of {} on this branch.".format(tid, plan),
