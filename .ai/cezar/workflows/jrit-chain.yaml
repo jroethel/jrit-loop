@@ -1,5 +1,5 @@
 # jrit-chain: committed brief -> plan -> drive compile and start, as one cezar task; the generated drive run
-# (jrit-drive.I<n>.<id8>) then runs the units and the landing: review -> local CI -> merge card -> squash push -> CI watch.
+# (jrit-drive.I<n>.<id8>) then runs the units and the landing: review -> local CI -> merge card -> squash push -> CI watch -> branch cleanup.
 # Cezar 0.15.0 graph format (version 2). The kit stamp script copies this file to
 # .ai/cezar/workflows/jrit-chain.yaml and the kit scripts to .ai/jrit/; edit the
 # template in jrit-core, never the stamped copy.
@@ -185,7 +185,8 @@ nodes:
   - { id: ping-ci-red, name: "Ping: CI red card", type: check, command: "bash .ai/jrit/ping.sh card ci-watch" }
   - { id: ci-red, type: gate.human, name: "GitHub CI is red", message: "{{nodes.ci-watch.output}}\nIf the output above names failing jobs, the three commands above undo the push; if it says nothing is known to be broken, check the Actions tab and do not undo. Approve or reject: either one ends this run as failed with this card as its reason." }
   - { id: cleanup, name: "Clean up the generated workflow", type: check, command: "bash .ai/jrit/stage-drive.sh cleanup" }
-  - { id: ping-ok, name: "Ping: done", type: check, command: "bash .ai/jrit/ping.sh end ok" }
+  - { id: branch-cleanup, name: "Delete the landing run's branch", type: check, command: "bash .ai/jrit/stage-end.sh branch-cleanup" }
+  - { id: ping-ok, name: "Ping: done", type: check, command: "bash .ai/jrit/ping.sh end ok branch-cleanup" }
   - { id: ok, name: "Done", type: end, status: success }
   - { id: ping-merge-rejected, name: "Ping: merge rejected", type: check, command: "bash .ai/jrit/ping.sh end merge-rejected" }
   - { id: merge-rejected, name: "Merge rejected", type: end, status: failed }
@@ -281,8 +282,10 @@ edges:
   - { from: ping-ci-red.fail, to: ci-red }
   - { from: ci-red.approve, to: ping-ci-red-after-push }
   - { from: ci-red.reject, to: ping-ci-red-after-push }
-  - { from: cleanup.pass, to: ping-ok }
-  - { from: cleanup.fail, to: ping-ok }
+  - { from: cleanup.pass, to: branch-cleanup }
+  - { from: cleanup.fail, to: branch-cleanup }
+  - { from: branch-cleanup.pass, to: ping-ok }
+  - { from: branch-cleanup.fail, to: ping-ok }
   - { from: ping-ok.pass, to: ok }
   - { from: ping-ok.fail, to: ok }
   - { from: ping-merge-rejected.pass, to: merge-rejected }

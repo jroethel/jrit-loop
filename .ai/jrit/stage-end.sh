@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Chain ending scripts: local CI, the merge card, squash-merge and push, GitHub CI watch.
+# Chain ending scripts: local CI, the merge card, squash-merge and push, GitHub CI watch,
+# and the landing run's branch cleanup.
 # Run as `bash .ai/jrit/stage-end.sh <subcommand>` with cwd = the run worktree.
 # Reads the preflight state files from the git dir (jrit-chain-base|brief|issue)
 # and .ai/jrit/kit.conf; depends on bash, git, jq, python3, and gh.
@@ -7,8 +8,8 @@ set -uo pipefail
 
 SUB="${1:-}"
 case "$SUB" in
-  local-ci|merge-card|merge-push|ci-watch) ;;
-  *) echo "stage-end: usage: stage-end.sh local-ci|merge-card|merge-push|ci-watch"; exit 1 ;;
+  local-ci|merge-card|merge-push|ci-watch|branch-cleanup) ;;
+  *) echo "stage-end: usage: stage-end.sh local-ci|merge-card|merge-push|ci-watch|branch-cleanup"; exit 1 ;;
 esac
 
 [ -f .ai/jrit/kit.conf ] && . ./.ai/jrit/kit.conf
@@ -152,7 +153,8 @@ merge_card() {
 # RB is deliberately not local: the EXIT trap runs after this function
 # returns, and the restore handler still needs the branch name.
 merge_push() {
-  local base B N brief title sha ci_out out f files root del
+  local base B N brief title sha ci_out out f files root del tip ref
+  [ -n "${CEZ_RUN_ID:-}" ] || { echo "merge-push: CEZ_RUN_ID is not set; run this as a cezar check node"; exit 1; }
   clean_tree
   base=$(need_state jrit-chain-base); B=${base#origin/}
   RB=$(git branch --show-current)
@@ -168,6 +170,9 @@ merge_push() {
   }
   trap restore EXIT
 
+  rm -f "$(git rev-parse --git-path jrit-chain-green)"
+  tip=$(git rev-parse "$RB")
+  ref=$(landed_ref "$N")
   git fetch origin "$B" || { echo "merge-push: cannot fetch origin $B"; exit 1; }
   git checkout -q --detach "origin/$B" || { echo "merge-push: cannot detach at origin/$B"; exit 1; }
   if ! git merge --squash "$RB"; then
@@ -176,7 +181,7 @@ merge_push() {
     echo "merge-push: $RB conflicts with origin/$B in: ${files#, }; branch kept"
     exit 1
   fi
-  git -c commit.gpgsign=false commit -m "$title (Refs #$N)" -m "Squashed from $RB by chain run ${CEZ_RUN_ID:-unknown}; the step-by-step history was on jrit/chain-I$N." \
+  git -c commit.gpgsign=false commit -m "$title (Refs #$N)" -m "Squashed from $RB by chain run $CEZ_RUN_ID; the step-by-step history is kept at $ref (tip $tip)." \
     || { echo "merge-push: the squash commit failed"; exit 1; }
   if ! git merge-base --is-ancestor "origin/$B" "$RB"; then
     if ! ci_out=$(bash -c "${CI_COMMAND:-}" 2>&1); then
@@ -192,6 +197,10 @@ merge_push() {
   fi
   sha=$(git rev-parse HEAD)
   printf '%s\n' "$sha" > "$(git rev-parse --git-path jrit-chain-pushed)"
+  printf '%s\n' "$tip" > "$(git rev-parse --git-path jrit-chain-squashed)"
+  if ! del=$(git update-ref "$ref" "$tip" 2>&1); then
+    echo "merge-push: pushed, but could not write $ref: $(printf '%s\n' "$del" | head -n 1)"
+  fi
   if ! del=$(git branch -D "jrit/chain-I$N" 2>&1); then
     echo "merge-push: pushed, but could not delete jrit/chain-I$N: $(printf '%s\n' "$del" | head -n 1)"
   fi
@@ -240,6 +249,9 @@ ci_watch() {
       green)
         names=$(printf '%s' "$runs" | jq -r '[.[].name] | join(", ")')
         echo "GitHub CI green on $sha12: $names"
+        if printf '%s' "$runs" | jq -e 'any(.[]; .conclusion == "success")' >/dev/null; then
+          printf '%s\n' "$sha" > "$(git rev-parse --git-path jrit-chain-green)"
+        fi
         exit 0
         ;;
       red)
@@ -277,9 +289,39 @@ ci_watch() {
   done
 }
 
+landed_ref() { echo "refs/jrit/I$1/landed/${CEZ_RUN_ID:0:8}"; }
+
+# Deletes only this run's own branch, and only on full landed evidence (Refs #85).
+# One output line; exit 0 for a delete or the designed keep (no green verdict), 1 for every other keep.
+branch_cleanup() {
+  local b green pushed squashed tip n ref out
+  keep() { echo "branch-cleanup: kept ${b:-HEAD}: $1"; exit "${2:-1}"; }
+  b=$(git branch --show-current)
+  [ -n "$b" ] || keep "no branch checked out"
+  [ -n "${CEZ_BRANCH:-}" ] && [ "$CEZ_BRANCH" = "$b" ] || keep "not this run's branch (CEZ_BRANCH=${CEZ_BRANCH:-})"
+  [ -n "${CEZ_RUN_ID:-}" ] || keep "CEZ_RUN_ID is not set"
+  green=$(state jrit-chain-green) || keep "no green CI verdict (watch off, no run, or not green)" 0
+  pushed=$(state jrit-chain-pushed) || keep "no pushed marker"
+  [ "$green" = "$pushed" ] || keep "the green verdict is not for the pushed commit"
+  squashed=$(state jrit-chain-squashed) || keep "no squashed tip recorded"
+  tip=$(git rev-parse "refs/heads/$b")
+  [ "$tip" = "$squashed" ] || keep "the branch moved since the squash (${squashed:0:12} squashed, now ${tip:0:12})"
+  n=$(state jrit-chain-issue) || keep "no issue number recorded"
+  ref=$(landed_ref "$n")
+  [ "$(git rev-parse -q --verify "$ref" 2>/dev/null)" = "$squashed" ] || keep "archive ref $ref is missing or not at the squashed tip"
+  [ -z "$(git status --porcelain)" ] || keep "uncommitted or untracked files in the run worktree"
+  out=$(git checkout -q --detach 2>&1) || keep "cannot detach the worktree: $(printf '%s\n' "$out" | head -n 1)"
+  if ! out=$(git branch -D "$b" 2>&1); then
+    git checkout -q "$b" >/dev/null 2>&1 || :
+    keep "git branch -D failed: $(printf '%s\n' "$out" | head -n 1)"
+  fi
+  echo "branch-cleanup: deleted $b at ${tip:0:12}; history at $ref; restore: git branch $b $ref"
+}
+
 case "$SUB" in
   local-ci) local_ci ;;
   merge-card) merge_card ;;
   merge-push) merge_push ;;
   ci-watch) ci_watch ;;
+  branch-cleanup) branch_cleanup ;;
 esac

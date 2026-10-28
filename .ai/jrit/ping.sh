@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Ping a Telegram bot for a card or a run end. Run as a cezar check node:
 #   bash .ai/jrit/ping.sh card <node id>   the node whose output holds the card text
-#   bash .ai/jrit/ping.sh end <end node id>
+#   bash .ai/jrit/ping.sh end <end node id> [<node id>]   a named node's output is appended to the message
 # Reads ${JRIT_PING_CONF:-$HOME/.config/jrit/ping.conf} (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID);
 # unconfigured is a no-op. Always exits 0 so a failed ping never fails the graph.
 set -uo pipefail
 
-kind=${1:-} node=${2:-}
-case "$kind" in card|end) ;; *) echo "ping: usage: ping.sh card|end <node id>"; exit 0 ;; esac
-[ -n "$node" ] || { echo "ping: usage: ping.sh card|end <node id>"; exit 0; }
+kind=${1:-} node=${2:-} extra=${3:-}
+case "$kind" in card|end) ;; *) echo "ping: usage: ping.sh card <node id> | ping.sh end <end node id> [<node id>]"; exit 0 ;; esac
+[ -n "$node" ] || { echo "ping: usage: ping.sh card <node id> | ping.sh end <end node id> [<node id>]"; exit 0; }
 
 conf=${JRIT_PING_CONF:-$HOME/.config/jrit/ping.conf}
 TELEGRAM_BOT_TOKEN='' TELEGRAM_CHAT_ID=''
@@ -45,6 +45,11 @@ else
   err="$(printf '%s' "$rec" | jq -r '.error // "ok"' 2>/dev/null)"
   text="$CEZ_PROJECT_ID/$head8 $wf ended $node (${st:-unknown}): ${err:-ok}"
   tag="end $node"
+  if [ -n "$extra" ]; then
+    more="$(printf '%s' "$rec" | jq -r --arg n "$extra" '.graphState.outputs[$n].output // ""' 2>/dev/null | sed -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}')"
+    [ -z "$more" ] || text="$text
+$more"
+  fi
 fi
 
 code="$(curl -s --max-time 10 -o /dev/null -w '%{http_code}' \
