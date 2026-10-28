@@ -1,6 +1,6 @@
 # jrit-chain: committed brief -> plan -> drive compile and start, as one cezar task; the generated drive run
 # (jrit-drive.I<n>.<id8>) then runs the units and the landing: review -> local CI -> merge card -> squash push -> CI watch -> branch cleanup.
-# Cezar 0.15.0 graph format (version 2). The kit stamp script copies this file to
+# Cezar graph format (version 2). The kit stamp script copies this file to
 # .ai/cezar/workflows/jrit-chain.yaml and the kit scripts to .ai/jrit/; edit the
 # template in jrit-core, never the stamped copy.
 #

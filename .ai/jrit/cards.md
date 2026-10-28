@@ -3,7 +3,7 @@
 A stage that needs the human asks through one card, which the graph shows with no deadline.
 End the reply with one line that starts `JRIT-ASK ` and carries a compact JSON object on that same line, with nothing after it.
 The JSON is `{"questions":[...]}` with 1 to 4 questions, this chain's cap (cezar allows up to 20); each question is `{"header":"...","question":"...","options":[...]}`, and each option is `{"label":"...","description":"..."}`.
-The limits are cezar 0.15.0's own card schema: header 1 to 12 characters, question 1 to 400 (keep it under 380, because the extractor prefixes the first question with its card number), 2 to 10 options per question, label 1 to 60, description at most 280.
+The limits are cezar's own card schema: header 1 to 12 characters, question 1 to 400 (keep it under 380, because the extractor prefixes the first question with its card number), 2 to 10 options per question, label 1 to 60, description at most 280.
 Question texts are unique within the card, option labels are unique within a question, and the only other key allowed on a question is `"multiSelect": true`.
 Keep the whole JSON line under 3,500 characters, because the graph reads only the last 4,000 characters of the reply.
 The header names the decision in a word or two, the question is one short sentence ending in "?", and each description is one line saying what the option means or costs.

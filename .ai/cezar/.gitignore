@@ -28,3 +28,7 @@ automation-poll.lock.guard/
 automation-mutation.lock.guard/
 automation-mutation.lock
 workflows/jrit-drive.*.yaml
+lifecycle/
+config.lifecycle.lock/
+config.json.*.tmp
+layouts/
