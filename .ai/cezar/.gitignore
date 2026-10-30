@@ -32,3 +32,4 @@ lifecycle/
 config.lifecycle.lock/
 config.json.*.tmp
 layouts/
+webhooks/

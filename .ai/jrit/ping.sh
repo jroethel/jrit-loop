@@ -38,6 +38,7 @@ if [ "$kind" = card ]; then
   q="$(printf '%s' "$last" | jq -r '.questions[0].question // empty' 2>/dev/null)"
   [ -n "$q" ] || q=$first
   text="$CEZ_PROJECT_ID/$head8 $wf card at $node: $q
+(replies to this chat are not read; answer in the cockpit, or with the command below)
 answer: curl -s -X POST $CEZ_API_URL/api/v1/p/$CEZ_PROJECT_ID/runs/$CEZ_RUN_ID/messages -H 'content-type: application/json' -d '{\"text\":\"<your answer>\",\"images\":[]}'"
   tag=card
 else

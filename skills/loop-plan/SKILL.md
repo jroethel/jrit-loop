@@ -118,6 +118,7 @@ This is the soft, optional review being skipped, unlike the reviewer-conduct con
 **Triage.** Record your own verdict - revise or no - with a one-line reason for every finding; none applied silently or dismissed without a written reason.
 Build one table: finding, lens, severity, reviewer rationale (condensed), your verdict.
 The table is kept for the round: the user picks which findings get incorporated there, in one question, and you revise the skeleton with the picks.
+Print the table in the same reply as the round's card, immediately above it, in every session, including a dispatched one whose card rules otherwise forbid tables: a pick made without seeing the findings is a rubber stamp.
 
 ## Step 3 - The one question round`[gate:ASK]`
 

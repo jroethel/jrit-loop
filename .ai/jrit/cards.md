@@ -11,6 +11,10 @@ Put the recommended option first and end its label with " (recommended)".
 Ask one decision per question; a scope change gets its own question.
 Background the answer depends on goes in the option descriptions, and anything longer goes in a committed file the question names by path.
 A card that fails cezar's schema reaches the human as a text card asking for a resend, so check every limit above before you print it.
+The cockpit adds an "Other…" free-text field and a "Need more info" choice to every question, so never add either as an option yourself.
 The answer arrives as one `<header>: <label>` line per question, or as free text the human typed below the card.
+An answer that is not one of your labels is the human's own answer: act on it.
+An answer that asks for more information means the human cannot decide yet: explain what that question hinges on, then ask it again on a new card; never guess an answer for it.
 Outside the card, narrate in one-line status updates: no reports, tables, or summaries in the session.
+The one exception is a card that asks the human to accept or pick review findings (a Rubix triage, or any skill step that says to present a table before a pick): print the findings as a compact list immediately above the card, one line per finding with its id, lens, severity, the finding in a few words, and your verdict, so the human never picks findings shown nowhere.
 Never write JRIT-ASK in a reply that does not ask.
