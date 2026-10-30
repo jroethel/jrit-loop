@@ -8,7 +8,9 @@ Writes a cezar version 2 workflow named jrit-drive.I<n>.<chain id8> (D9):
 preflight, an entry ladder, the drive card before unit 1, per auto unit an
 implement agent, its gate, a validator on the other model, a landed check, a
 two-round repair loop and a cut-off loop (D24), a gate.human per human unit
-(D18), then the landing copied verbatim from the template (D15).
+(D18), a gate.human per placed human checkpoint ahead of the unit it comes
+before, carrying the checkpoint's text (#100), then the landing copied
+verbatim from the template (D15).
 Stdlib only: the YAML is written by string templates, every prompt as a |
 block. The parser is plan_lint.py beside this file.
 """
@@ -19,7 +21,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.dont_write_bytecode = True  # no __pycache__ in .ai/jrit/ or the template kit
-from plan_lint import read_file, units
+from plan_lint import checkpoints, read_file, units
 
 STAGE_TOOLS = ("[Read, Edit, Write, Grep, Glob, Bash, Skill, Agent, ToolSearch, "
                "TaskCreate, TaskUpdate, TaskList, TaskGet]")
@@ -138,10 +140,22 @@ def compile_plan(plan, issue, chain, template, routing):
     resume = resume_prompt(tpl)
     g = Graph()
 
-    def first(k):
+    # Placed human checkpoints, by the unit they come before; a checkpoint
+    # before unit 1 rides the drive card instead (stage-drive.sh card).
+    before = {}
+    for c in checkpoints(read_file(plan)):
+        if c["place"] and c["place"][1] > 1:
+            before.setdefault(c["place"][1], []).append(c)
+
+    def unit_entry(k):
         if k > len(tasks):
             return "drive-gate"
         return ("u{}-implement" if tasks[k - 1]["shape"] == "auto" else "ping-u{}-human").format(k)
+
+    def first(k):
+        if k in before:
+            return "ping-" + before[k][0]["id"].lower()
+        return unit_entry(k)
 
     g.flat("start", "Start", "start")
     g.check("preflight", "Preflight", "bash .ai/jrit/stage-preflight.sh")
@@ -170,6 +184,19 @@ def compile_plan(plan, issue, chain, template, routing):
     g.edge("drive-card.reject", "ping-drive-rejected")
     g.ping("ping-drive-rejected", "Ping: drive rejected", "end", "drive-rejected", "drive-rejected")
     g.flat("drive-rejected", "Drive rejected", "end", status="failed")
+
+    for k, cps in sorted(before.items()):
+        for i, c in enumerate(cps):
+            h = c["id"].lower()
+            nxt = "ping-" + cps[i + 1]["id"].lower() if i + 1 < len(cps) else unit_entry(k)
+            where = "before unit %d" % k if k <= len(tasks) else "before the landing"
+            g.ping("ping-" + h, "Checkpoint %s ping" % c["id"], "card", h + "-text", h + "-text")
+            g.check(h + "-text", "Checkpoint %s text" % c["id"], "bash .ai/jrit/stage-drive.sh checkpoint " + c["id"])
+            g.flat(h, "Checkpoint %s: yours, %s" % (c["id"], where), "gate.human", message=q("{{nodes.%s-text.output}}" % h))
+            g.edge(h + "-text.pass", h)
+            g.edge(h + "-text.fail", "ping-unit-failed")
+            g.edge(h + ".approve", nxt)
+            g.edge(h + ".reject", "ping-unit-failed")
 
     for k, t in enumerate(tasks, 1):
         tid, nxt, u = t["id"], first(k + 1), "u%d-" % k

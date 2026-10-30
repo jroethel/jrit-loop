@@ -7,15 +7,16 @@
 #   stage-drive.sh start       start that workflow as its own run, once per chain run (D27)
 #   stage-drive.sh card        the drive card text before unit 1 (D4, D25)
 #   stage-drive.sh human <id>  the gate message of a human-shaped task (D18)
+#   stage-drive.sh checkpoint <id>  the gate card of a placed human checkpoint (#100)
 #   stage-drive.sh cleanup     delete this run's generated workflow file (D9); exits 0
 # <root> is the parent of the git common dir, where cezar loads workflows (D1).
 set -uo pipefail
 
 fail() { echo "stage-drive: $1"; exit 1; }
-usage() { echo "usage: stage-drive.sh compile | start | card | human <task id> | cleanup"; exit 2; }
+usage() { echo "usage: stage-drive.sh compile | start | card | human <task id> | checkpoint <id> | cleanup"; exit 2; }
 case "${1:-}" in
 compile | start | card | cleanup) ;;
-human) [ -n "${2:-}" ] || usage ;;
+human | checkpoint) [ -n "${2:-}" ] || usage ;;
 *) usage ;;
 esac
 . ./.ai/jrit/kit-lib.sh || fail "cannot load .ai/jrit/kit-lib.sh; restamp the chain kit"
@@ -58,7 +59,7 @@ py() {
 import fnmatch, re, sys
 sys.dont_write_bytecode = True
 sys.path.insert(0, ".ai/jrit")
-from plan_lint import analyze, files_of, read_file, section, units
+from plan_lint import analyze, checkpoints, files_of, read_file, section, units
 
 plan, verb = sys.argv[1], sys.argv[2]
 text = read_file(plan)
@@ -70,13 +71,19 @@ if verb == "human":
     print("Task {} is human-shaped: {}. Do it on this branch, then approve; "
           "reject ends the run.".format(t["id"], t["shape_why"]))
     sys.exit(0)
+if verb == "checkpoint":
+    c = next((c for c in checkpoints(text) if c["id"] == sys.argv[3] and c["place"]), None)
+    if c is None:
+        print("stage-drive: {} is not a placed human checkpoint of {}".format(sys.argv[3], plan))
+        sys.exit(1)
+    n = len(units(text))
+    where = "before unit {}".format(c["place"][1]) if c["place"][1] <= n else "before the landing"
+    print("Checkpoint {} is yours, {}. The run waits here until you approve.".format(c["id"], where))
+    print(c["text"])
+    print("Do it now; what it commits goes on this branch. Approve when it is done; reject ends the run.")
+    sys.exit(0)
 lines, inside, tasks = analyze(text)
-staged = []
-span = section(lines, inside, re.compile(r"^##\s+Human checkpoints\s*$"))
-if span:
-    staged = [lines[j][2:].strip() for j in range(span[0] + 1, span[1])
-              if not inside[j] and lines[j].startswith("- ")
-              and "before unit 1" in lines[j]]
+staged = [c["text"] for c in checkpoints(text) if c["place"] == ("before", 1)]
 risks = []
 for glob in sys.argv[3].split():
     for t in tasks:
@@ -103,8 +110,8 @@ PY
 }
 
 case "$1" in
-human)
-  py human "$2"
+human | checkpoint)
+  py "$1" "$2"
   exit $?
   ;;
 card)

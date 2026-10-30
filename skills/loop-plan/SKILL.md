@@ -216,6 +216,10 @@ Text sketch of task-level depends-on relations (which tasks can run in parallel,
 ## Human checkpoints
 Where the executor stops and asks a human.
 Every [judgment] criterion from the brief lands here, never on a task.
+One bullet per checkpoint, `- H<n>, <placement>: <what the human does>`, with continuation lines indented two spaces; the chain shows the whole bullet on the gate card, so write it as the instruction the human reads there.
+The placement is one of `before unit 1` (asked on the drive card), `before wave <N>`, `before Task <T>`, or `after Task <T>` / `after Tasks <T> and <U>`; the drive compiles each into a gate ahead of the unit it comes before, and the run waits there until the human approves.
+A checkpoint with any other wording (`inside`, `at`, `during`) is not a gate: it belongs to the hand-off, and no task's acceptance check may depend on it.
+A task whose test or step needs the checkpoint's artifact depends on the checkpoint, so the checkpoint is placed before that task's wave.
 
 ## Run shape
 The table Step 7 pastes, never hand-written.

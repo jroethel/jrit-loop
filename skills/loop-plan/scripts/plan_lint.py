@@ -5,6 +5,7 @@ import its functions from a directory copy. Fenced code blocks never count as
 plan structure; a fence whose info string carries path=<p> is a test block.
 
 Verbs: check, lint, units --json, tests --out <dir>, run-table, human-tasks.
+Importable: units, checkpoints, run_table, and the parser helpers.
 check and lint print "plan_lint <sha12 of this file>" first, so a plan
 accepted by one copy and rejected by another shows which copy ran.
 """
@@ -289,6 +290,55 @@ def table_human_ids(lines, inside):
         if m and cells[shape_i] == "human":
             ids.append(m.group(1))
     return ids
+
+
+CHECKPOINT_RE = re.compile(r"^- (H[0-9]+[a-z]?),\s*(.*)$")
+PLACE_RE = re.compile(r"^(before|after)\s+(wave|unit|Tasks?)\s+(\d+[a-z]?(?:\s*(?:,|and)\s*\d+[a-z]?)*)",
+                      re.IGNORECASE)
+
+
+def checkpoints(text):
+    """The Human checkpoints bullets: id, text (continuation lines joined), and
+    place, the unit the checkpoint comes before as ("before", k), or None.
+    "before wave N" is the first unit of wave N, "before unit K" is K,
+    "before Task T" is T's unit, and "after Task(s) T..." is the unit after
+    the last of them; one past the last unit means before the landing.
+    Any other wording (inside, at, during) has no place and compiles to nothing."""
+    lines, inside, tasks = analyze(text)
+    span = section(lines, inside, re.compile(r"^##\s+Human checkpoints\s*$"))
+    out = []
+    if span is None:
+        return out
+    cur = None
+    for j in range(span[0] + 1, span[1]):
+        if inside[j]:
+            continue
+        line = lines[j]
+        m = CHECKPOINT_RE.match(line)
+        if m:
+            cur = {"id": m.group(1), "text": line[2:].strip(), "rest": m.group(2), "place": None}
+            out.append(cur)
+        elif cur is not None and line.startswith("  ") and line.strip():
+            cur["text"] += "\n" + line.strip()
+        elif line.strip():
+            cur = None
+    order = [t["id"] for t in run_order(tasks)]
+    waves = wave_of(tasks)
+    for c in out:
+        m = PLACE_RE.match(c["rest"])
+        if not m:
+            continue
+        when, kind = m.group(1).lower(), m.group(2).lower()
+        ids = re.findall(r"\d+[a-z]?", m.group(3))
+        if kind == "wave":
+            ks = [i + 1 for i, tid in enumerate(order) if waves[tid] == int(ids[0])]
+        elif kind == "unit":
+            ks = [int(ids[0])]
+        else:
+            ks = [order.index(t) + 1 for t in ids if t in order]
+        if ks:
+            c["place"] = ("before", min(ks) if when == "before" else max(ks) + 1)
+    return out
 
 
 def human_ids(lines, inside):
